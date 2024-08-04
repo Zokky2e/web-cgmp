@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
+app.use(cors()); // Enable CORS for all origins
 const port = process.env.PORT || 3000;
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
@@ -27,7 +29,6 @@ app.use(express.json()); // Parse JSON bodies
 app.get("/", (req, res) => {
 	User.find()
 		.then((docs) => {
-			console.log(docs);
 			res.send(docs);
 		})
 		.catch((err) => res.send(err));
