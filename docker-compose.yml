@@ -1,0 +1,11 @@
+services:
+  backend:
+    build: ./backend-cgmp
+    command: npx nodemon index.js
+    ports:
+      - "3000:3000"  # Adjust based on your backend port
+  frontend:
+    build: ./frontend-cgmp
+    command: npm run dev
+    ports:
+      - "3001:3001"  # Adjust based on your frontend port
