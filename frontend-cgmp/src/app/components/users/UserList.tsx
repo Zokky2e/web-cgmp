@@ -8,9 +8,8 @@ export default function UserList() {
 	const [data, setData] = useState<IUser[]>([]);
 
 	useEffect(() => {
-		// Fetch data from the backend API using axios
 		axios
-			.get("http://localhost:3000/")
+			.get(`http://localhost:3000/api/users`)
 			.then((response) => {
 				setData(response.data);
 			})
