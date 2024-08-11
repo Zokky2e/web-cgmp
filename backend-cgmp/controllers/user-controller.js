@@ -1,4 +1,73 @@
 const User = require("../models/user");
+const passport = require("passport");
+
+exports.registerUser = async (req, res) => {
+	try {
+		const { email, password, firstName, lastName } = req.body;
+		const newUser = new User({
+			email,
+			password,
+			firstName,
+			lastName,
+			age: 18,
+			job: "",
+		});
+		await newUser.save();
+		res.status(201).json(newUser);
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
+
+// Login a user
+exports.loginUser = (req, res, next) => {
+	passport.authenticate("local", (err, user, info) => {
+		if (err) return next(err);
+		if (!user) return res.status(400).json({ message: info.message });
+		req.logIn(user, (err) => {
+			if (err) return next(err);
+			return res.json({ message: "Logged in successfully", user });
+		});
+	})(req, res, next);
+};
+
+exports.logoutUser = (req, res) => {
+	req.logout((err) => {
+		if (err) {
+			return res.status(500).json({ message: err.message });
+		}
+		req.session.destroy((err) => {
+			if (err) {
+				return res.status(500).json({ message: err.message });
+			}
+			res.status(200).json({ message: "Logged out successfully" });
+		});
+	});
+};
+
+exports.getUserStatus = async (req, res) => {
+	try {
+		if (req.isAuthenticated()) {
+			// Assuming req.user is set by Passport.js
+			const user = await User.findById(req.user._id).exec();
+			res.status(200).json({
+				isAuthenticated: true,
+				user: {
+					id: user._id,
+					email: user.email,
+					name: user.name,
+				},
+			});
+		} else {
+			res.status(200).json({
+				isAuthenticated: false,
+				user: null,
+			});
+		}
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+};
 
 // Create a new user
 exports.createUser = async (req, res) => {

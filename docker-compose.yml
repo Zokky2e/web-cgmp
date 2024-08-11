@@ -9,3 +9,9 @@ services:
     command: npm run dev
     ports:
       - "3001:3001"  # Adjust based on your frontend port
+
+
+#backend: 
+#cd backend-cgmp && npx nodemon index.js
+#frontend:
+#cd frontend-cgmp &&  npm run dev
