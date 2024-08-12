@@ -1,6 +1,7 @@
 export interface IUser {
 	id: String;
-	name: String;
+	firstName: String;
+	lastName: String;
 	age: Number;
 	job: String;
 }

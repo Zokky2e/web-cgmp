@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "./components/navigation/Navigation";
 import { createTheme } from "@mui/material/styles";
+import Footer from "./components/footer/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const theme = createTheme({
@@ -44,6 +45,7 @@ export default function RootLayout({
 			<body className={inter.className}>
 				<Navigation />
 				{children}
+				<Footer />
 			</body>
 		</html>
 	);

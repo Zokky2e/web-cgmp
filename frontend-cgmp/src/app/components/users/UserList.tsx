@@ -22,7 +22,8 @@ export default function UserList() {
 		<ul>
 			{data.map((item, index) => (
 				<li key={index}>
-					{item.name} - {item.age.toString()} - {item.job}
+					{item.firstName} {item.lastName} - {item.age.toString()} -{" "}
+					{item.job}
 				</li>
 			))}
 		</ul>
