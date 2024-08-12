@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"; // Mark this component as a Client Component
 
 import { MouseEvent, useEffect, useState } from "react";
@@ -38,22 +39,33 @@ export default function Navigation() {
 	useEffect(() => {
 		// Check if the user is authenticated on component mount
 		async function checkAuthStatus() {
-			try {
-				const response = await axios.get(
-					"http://localhost:3000/api/user/status",
-					{
-						withCredentials: true,
+			if (
+				location.pathname !== "/login" &&
+				location.pathname !== "/register"
+			) {
+				try {
+					const response = await axios.get(
+						"http://localhost:3000/api/user/status",
+						{
+							withCredentials: true,
+						}
+					);
+					setIsAuthenticated(response.data.isAuthenticated);
+					setUser(response.data.user);
+					if (!response.data.isAuthenticated) {
+						debugger;
+						window.location.href = "/login";
 					}
-				);
-				setIsAuthenticated(response.data.isAuthenticated);
-				setUser(response.data.user);
-			} catch (error) {
-				console.error("Error checking auth status:", error);
+				} catch (error) {
+					debugger;
+					console.error("Error checking auth status:", error);
+					window.location.href = "/login";
+				}
 			}
 		}
 
 		checkAuthStatus();
-	}, []);
+	}, [location.pathname]);
 
 	const handleOpenNavMenu = (event: MouseEvent<HTMLElement>) => {
 		setAnchorElNav(event.currentTarget);

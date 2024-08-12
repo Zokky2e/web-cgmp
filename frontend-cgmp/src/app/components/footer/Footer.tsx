@@ -9,22 +9,14 @@ import { theme } from "@/app/layout";
 
 function Copyright() {
 	return (
-		<Typography
-			variant="body2"
-			color="text.secondary"
-			sx={{
-				display: "flex",
-				flexDirection: "row",
-				justifyContent: "space-between",
-			}}
-		>
-			<div>{"Copyright © Zoltan Balko Macsai "}</div>
+		<>
+			<p>{"Copyright © Zoltan Balko Macsai "}</p>
 
-			<div>
+			<p>
 				{new Date().getFullYear()}
 				{"."}
-			</div>
-		</Typography>
+			</p>
+		</>
 	);
 }
 
@@ -50,9 +42,18 @@ export default function Footer() {
 								: theme.palette.grey[800],
 					}}
 				>
-					<Container maxWidth="sm">
+					<Typography
+						variant="subtitle1"
+						maxWidth="sm"
+						color="text.secondary"
+						sx={{
+							display: "flex",
+							flexDirection: "row",
+							justifyContent: "space-between",
+						}}
+					>
 						<Copyright />
-					</Container>
+					</Typography>
 				</Box>
 			</Box>
 		</ThemeProvider>
