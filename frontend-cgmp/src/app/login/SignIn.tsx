@@ -21,6 +21,7 @@ import { Alert } from "@mui/material";
 export default function SignIn() {
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
+
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
@@ -35,7 +36,7 @@ export default function SignIn() {
 				"http://localhost:3000/api/login",
 				credentials,
 				{
-					withCredentials: true, // Important for handling sessions
+					withCredentials: true,
 				}
 			);
 
@@ -43,20 +44,16 @@ export default function SignIn() {
 			setError("");
 			console.log(response.data);
 
-			// Redirect or perform further actions on successful login
-			window.location.href = "/"; // Redirect to home page or dashboard
+			window.location.href = "/";
 		} catch (er: any) {
 			if (er.response) {
-				// The request was made, and the server responded with a status code that falls out of the range of 2xx
 				setError(
 					er.response.data.message ||
 						"Login failed. Please try again."
 				);
 			} else if (er.request) {
-				// The request was made, but no response was received
 				setError("No response from server. Please try again later.");
 			} else {
-				// Something happened in setting up the request that triggered an Error
 				setError("An unexpected error occurred.");
 			}
 			setSuccess("");

@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
@@ -6,6 +7,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
 const User = require("./models/user");
 const userRoutes = require("./routes/user-routes");
+const polygonRoutes = require("./routes/polygon-routes");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -77,6 +79,9 @@ passport.deserializeUser(async (id, done) => {
 
 // Use user routes
 app.use("/api", userRoutes);
+
+// Use polygon routes
+app.use("/api", polygonRoutes);
 
 // Start the server
 app.listen(port, () => {

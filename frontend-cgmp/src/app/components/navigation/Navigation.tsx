@@ -39,28 +39,27 @@ export default function Navigation() {
 	useEffect(() => {
 		// Check if the user is authenticated on component mount
 		async function checkAuthStatus() {
-			if (
-				location.pathname !== "/login" &&
-				location.pathname !== "/register"
-			) {
-				try {
-					const response = await axios.get(
-						"http://localhost:3000/api/user/status",
-						{
-							withCredentials: true,
-						}
-					);
-					setIsAuthenticated(response.data.isAuthenticated);
-					setUser(response.data.user);
-					if (!response.data.isAuthenticated) {
-						debugger;
+			try {
+				const response = await axios.get(
+					"http://localhost:3000/api/user/status",
+					{
+						withCredentials: true,
+					}
+				);
+				setIsAuthenticated(response.data.isAuthenticated);
+				setUser(response.data.user);
+				if (!response.data.isAuthenticated) {
+					if (
+						location.pathname !== "/login" &&
+						location.pathname !== "/register"
+					) {
 						window.location.href = "/login";
 					}
-				} catch (error) {
-					debugger;
-					console.error("Error checking auth status:", error);
-					window.location.href = "/login";
 				}
+			} catch (error) {
+				debugger;
+				console.error("Error checking auth status:", error);
+				window.location.href = "/login";
 			}
 		}
 
@@ -93,7 +92,7 @@ export default function Navigation() {
 			);
 			setIsAuthenticated(false);
 			setUser(null);
-			window.location.href = "/login"; // Redirect to login page
+			window.location.href = "/login";
 		} catch (error) {
 			console.error("Error logging out:", error);
 		}
