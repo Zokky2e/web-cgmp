@@ -1,5 +1,6 @@
 const axios = require("axios");
 const _ = require("underscore");
+const Polygon = require("../models/polygon");
 exports.getPolygons = async (req, res) => {
 	axios
 		.get(
@@ -27,7 +28,7 @@ exports.getPolygonById = async (req, res) => {
 		.get(url_step1)
 		.then(async (result) => {
 			if (_.isArray(result.data) && result.data.length > 0) {
-				const imageUrl = result.data[0].tile.ndvi;
+				const imageUrl = result.data[0].stats.ndvi;
 				const imageResponse = await axios({
 					url: imageUrl,
 					method: "GET",
@@ -45,4 +46,33 @@ exports.getPolygonById = async (req, res) => {
 			console.log(error);
 			res.status(400).json({ message: error.message });
 		});
+};
+
+exports.postPolygons = async (req, res) => {
+	try {
+		const userId = req.user.id;
+		const polygons = req.body;
+		//console.log(req.body);
+		const savedPolygons = await Promise.all(
+			polygons.map(async (polygonData) => {
+				const polygon = new Polygon({
+					userId,
+					polygonId: polygonData.id,
+					createdAt: new Date(polygonData.created_at),
+				});
+				console.log(polygon);
+				const url = `http://api.agromonitoring.com/agro/1.0/polygons?appid=${process.env.agromonitoring_api_key}`;
+				await axios
+					.post(url, polygonData)
+					.then(async (r) => {
+						polygon.polygonId = r.data.id;
+						await polygon.save();
+					})
+					.catch((err) => console.log(err));
+			})
+		);
+		res.status(201).json(savedPolygons);
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
 };

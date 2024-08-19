@@ -11,13 +11,17 @@
   "dependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@material/web": "^2.0.0",
     "@mui/icons-material": "^5.16.6",
     "@mui/material": "^5.16.6",
     "axios": "^1.7.3",
+    "mapbox-gl": "^3.6.0",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
+    "react-mapbox-gl": "^5.1.1",
+    "react-mapbox-gl-draw": "^2.0.4",
     "underscore": "^1.13.7"
   },
   "devDependencies": {
