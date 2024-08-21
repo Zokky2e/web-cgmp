@@ -52,7 +52,7 @@ const defaultCreatePolygonProps: CreatePolygonProps = {
 	onAddSuccess: () => {},
 };
 
-export default function CreatePolygon(
+export default function NewPolygon(
 	props: CreatePolygonProps = defaultCreatePolygonProps
 ) {
 	const [open, setOpen] = useState(false);
@@ -60,6 +60,10 @@ export default function CreatePolygon(
 	const [currentNewPolygon, setCurrentNewPolygon] = useState<IPolygon>({
 		name: "",
 	});
+
+	const handleOpen = () => setOpen(true);
+	const handleClose = () => setOpen(false);
+
 	function onDrawCreate(event: ICreatePolygon) {
 		const newPolygon: IPolygon = {
 			name: event.name,
@@ -74,9 +78,6 @@ export default function CreatePolygon(
 		setCurrentNewPolygon(newPolygon);
 		handleOpen();
 	}
-
-	const handleOpen = () => setOpen(true);
-	const handleClose = () => setOpen(false);
 
 	const createNewPolygon = () => {
 		console.log(currentNewPolygon);
@@ -118,20 +119,27 @@ export default function CreatePolygon(
 						}}
 						onDrawCreate={onDrawCreate}
 					/>
-					{props.oldPolygons.map((polygon, index) => (
-						<GeoJSONLayer
-							key={index}
-							fillPaint={{
-								"fill-color": "rgba(128, 0, 128, 0.3)",
-								"fill-outline-width": "2px",
-								"fill-outline-color": "#000",
-							}}
-							data={{
-								type: "FeatureCollection",
-								features: [polygon.geo_json],
-							}}
-						/>
-					))}
+					{props.oldPolygons.map((polygon, index) => {
+						const isSelected =
+							JSON.stringify(polygon.center) ===
+							JSON.stringify(props.center);
+						return (
+							<GeoJSONLayer
+								key={index}
+								fillPaint={{
+									"fill-color": isSelected
+										? "rgba(204, 255, 0, 0.3)"
+										: "rgba(128, 0, 128, 0.3)",
+									"fill-outline-width": "2px",
+									"fill-outline-color": "#000",
+								}}
+								data={{
+									type: "FeatureCollection",
+									features: [polygon.geo_json],
+								}}
+							/>
+						);
+					})}
 				</>
 			</Map>
 			<Button

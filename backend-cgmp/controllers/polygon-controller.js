@@ -2,16 +2,29 @@ const axios = require("axios");
 const _ = require("underscore");
 const Polygon = require("../models/polygon");
 exports.getPolygons = async (req, res) => {
-	axios
-		.get(
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit, 10) || 10;
+	const skip = (page - 1) * limit;
+
+	try {
+		const response = await axios.get(
 			`http://api.agromonitoring.com/agro/1.0/polygons?appid=${process.env.agromonitoring_api_key}`
-		)
-		.then((result) => {
-			res.status(200).json(result.data);
-		})
-		.catch((error) => {
-			res.status(400).json({ message: error.message });
+		);
+		const polygons = response.data;
+
+		// Slice the array to implement pagination
+		const paginatedPolygons = polygons.slice(skip, skip + limit);
+
+		res.status(200).json({
+			total: polygons.length,
+			page,
+			limit,
+			totalPages: Math.ceil(polygons.length / limit),
+			data: paginatedPolygons,
 		});
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
 };
 
 exports.getPolygonById = async (req, res) => {

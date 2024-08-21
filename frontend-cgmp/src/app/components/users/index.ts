@@ -1,2 +1,2 @@
-export * from "./UserList";
+export * from "./PolygonList";
 export * from "./NewPolygon";
