@@ -1,17 +1,18 @@
 import * as React from "react";
-import CssBaseline from "@mui/material/CssBaseline";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import Link from "@mui/material/Link";
+import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/app/layout";
+import {
+	footerContainerStyles,
+	footerStyles,
+	typographyStyles,
+} from "./FooterStyles";
 
 function Copyright() {
 	return (
 		<>
 			<p>{"Copyright © Zoltan Balko Macsai "}</p>
-
 			<p>
 				{new Date().getFullYear()}
 				{"."}
@@ -23,34 +24,12 @@ function Copyright() {
 export default function Footer() {
 	return (
 		<ThemeProvider theme={theme}>
-			<Box
-				sx={{
-					display: "flex",
-					flexDirection: "column",
-					minHeight: "100vh",
-				}}
-			>
-				<Box
-					component="footer"
-					sx={{
-						py: 3,
-						px: 2,
-						mt: "auto",
-						backgroundColor: (theme) =>
-							theme.palette.mode === "light"
-								? theme.palette.grey[200]
-								: theme.palette.grey[800],
-					}}
-				>
+			<Box sx={footerContainerStyles}>
+				<Box component="footer" sx={footerStyles}>
 					<Typography
 						variant="subtitle1"
-						maxWidth="sm"
 						color="text.secondary"
-						sx={{
-							display: "flex",
-							flexDirection: "row",
-							justifyContent: "space-between",
-						}}
+						sx={typographyStyles}
 					>
 						<Copyright />
 					</Typography>
