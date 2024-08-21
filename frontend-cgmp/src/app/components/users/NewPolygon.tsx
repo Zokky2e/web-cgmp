@@ -4,6 +4,7 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import {
 	Box,
 	Button,
+	Container,
 	Input,
 	Modal,
 	TextField,
@@ -19,8 +20,10 @@ const Map = ReactMapboxGl({
 	accessToken,
 });
 const mapStyle = {
-	width: "600px",
-	height: "600px",
+	width: "100%",
+	height: "500px",
+	maxWidth: "800px",
+	margin: "0 auto",
 };
 
 const style = "mapbox://styles/mapbox/satellite-v9";
@@ -98,50 +101,47 @@ export default function CreatePolygon(
 	};
 
 	return (
-		<>
-			<li>
-				<Map
-					style={style}
-					containerStyle={mapStyle}
-					zoom={[13]}
-					center={[props.center[0], props.center[1]]}
-				>
-					<>
-						<DrawControl
-							displayControlsDefault={false}
-							position="top-left"
-							controls={{
-								polygon: true,
-								trash: true,
+		<Container maxWidth="md">
+			<Map
+				style={style}
+				containerStyle={mapStyle}
+				zoom={[13]}
+				center={[props.center[0], props.center[1]]}
+			>
+				<>
+					<DrawControl
+						displayControlsDefault={false}
+						position="top-left"
+						controls={{
+							polygon: true,
+							trash: true,
+						}}
+						onDrawCreate={onDrawCreate}
+					/>
+					{props.oldPolygons.map((polygon, index) => (
+						<GeoJSONLayer
+							key={index}
+							fillPaint={{
+								"fill-color": "rgba(128, 0, 128, 0.3)",
+								"fill-outline-width": "2px",
+								"fill-outline-color": "#000",
 							}}
-							onDrawCreate={onDrawCreate}
+							data={{
+								type: "FeatureCollection",
+								features: [polygon.geo_json],
+							}}
 						/>
-						{props.oldPolygons.map((polygon, index) => (
-							<GeoJSONLayer
-								key={index}
-								fillPaint={{
-									"fill-color": "rgba(128, 0, 128, 0.3)",
-									"fill-outline-width": "2px",
-									"fill-outline-color": "#000",
-								}}
-								data={{
-									type: "FeatureCollection",
-									features: [polygon.geo_json],
-								}}
-							/>
-						))}
-					</>
-					{/* <GeoJSONLayer {...geojsonStyles} data={geojson} /> */}
-				</Map>
-				<Button
-					variant="contained"
-					onClick={() => {
-						addNewPolygons();
-					}}
-				>
-					Add
-				</Button>
-			</li>
+					))}
+				</>
+			</Map>
+			<Button
+				variant="contained"
+				onClick={() => {
+					addNewPolygons();
+				}}
+			>
+				Add
+			</Button>
 			<Modal
 				open={open}
 				onClose={handleClose}
@@ -185,6 +185,6 @@ export default function CreatePolygon(
 					</Box>
 				</Box>
 			</Modal>
-		</>
+		</Container>
 	);
 }

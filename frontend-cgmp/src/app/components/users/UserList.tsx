@@ -1,9 +1,24 @@
 "use client"; // Mark this component as a Client Component
 
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { Key, MutableRefObject, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { IPolygon } from "@/app/models";
-import { Button, CircularProgress, Typography } from "@mui/material";
+import {
+	Button,
+	Box,
+	CircularProgress,
+	Container,
+	Paper,
+	styled,
+	Table,
+	TableBody,
+	TableCell,
+	tableCellClasses,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Typography,
+} from "@mui/material";
 import _ from "underscore";
 import ReactMapboxGl, { Layer, GeoJSONLayer } from "react-mapbox-gl";
 import { green } from "@mui/material/colors";
@@ -18,6 +33,15 @@ const mapStyle = {
 	width: "600px",
 	height: "600px",
 };
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+	"&:nth-of-type(odd)": {
+		backgroundColor: theme.palette.action.hover,
+	},
+	// hide last border
+	"&:last-child td, &:last-child th": {
+		border: 0,
+	},
+}));
 
 const style = "mapbox://styles/mapbox/satellite-v9";
 export default function UserList() {
@@ -48,53 +72,67 @@ export default function UserList() {
 	}
 
 	return (
-		<>
+		<Container maxWidth="md">
 			{loading && <CircularProgress />}
 			{error && <Typography color="error">{error}</Typography>}
-			<ul>
-				<CreatePolygon
-					center={center}
-					oldPolygons={data}
-					onAddSuccess={() => {
-						fetchPolygons();
-					}}
-				/>
-				{data.map((item, index) => (
-					<li key={index}>
-						{item.center &&
-						item.geo_json &&
-						item.geo_json.geometry.coordinates ? (
-							<Map
-								center={[item.center[0], item.center[1]]}
-								style={style}
-								zoom={[13]}
-								containerStyle={mapStyle}
-							>
-								<GeoJSONLayer
-									fillPaint={{
-										"fill-color": "rgba(128, 0, 128, 0.3)",
-										"fill-outline-width": "2px",
-										"fill-outline-color": "#000",
+			<CreatePolygon
+				center={center}
+				oldPolygons={data}
+				onAddSuccess={() => {
+					fetchPolygons();
+				}}
+			/>
+			<Box my={4}>
+				<TableContainer component={Paper}>
+					<Table>
+						<TableHead>
+							<TableRow>
+								<TableCell>Field Name</TableCell>
+								<TableCell align="right">Area</TableCell>
+								<TableCell align="right">Center</TableCell>
+								<TableCell align="right">Created At</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{data.map((row, index) => (
+								<StyledTableRow
+									key={
+										row.id
+											? (row.id as Key)
+											: (index as Key)
+									}
+									onClick={() => {
+										setCenter(
+											row.center ? row.center : [0, 0]
+										);
 									}}
-									data={{
-										type: "FeatureCollection",
-										features: [item.geo_json],
-									}}
-								/>
-							</Map>
-						) : (
-							<></>
-						)}
-						{/* <Image
-							src={openImage(item.id, item.created_at)}
-							alt="map"
-							width={400}
-							height={400}
-						/> */}
-						{item.name} - {item.area?.toString()}
-					</li>
-				))}
-			</ul>
-		</>
+								>
+									<TableCell component="th" scope="row">
+										{row.name}
+									</TableCell>
+									<TableCell align="right">
+										{row.area ? row.area.toFixed(4) : "0"}
+									</TableCell>
+									<TableCell align="right">
+										{row.center
+											? `${row.center[0].toFixed(
+													4
+											  )}, ${row.center[1].toFixed(4)}`
+											: "[0, 0]"}
+									</TableCell>
+									<TableCell align="right">
+										{row.created_at
+											? new Date(
+													row.created_at
+											  ).toUTCString()
+											: new Date().toUTCString()}
+									</TableCell>
+								</StyledTableRow>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
+			</Box>
+		</Container>
 	);
 }
