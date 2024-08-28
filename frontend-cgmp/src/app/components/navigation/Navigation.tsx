@@ -27,10 +27,12 @@ import {
 	menuBoxStyles,
 	avatarBoxStyles,
 	userMenuStyles,
+	navBoxItemStyles,
 } from "./NavigationStyles";
+import MenuIcon from "@mui/icons-material/Menu";
 import { theme } from "@/app/layout";
 
-const pages = ["Products", "Pricing", "Blog"];
+const pages = ["Plots", "Tools", "Forum"];
 const settings = [
 	{ title: "Login", url: "/login" },
 	{ title: "Register", url: "/register" },
@@ -136,7 +138,7 @@ export default function Navigation() {
 								onClick={handleOpenNavMenu}
 								color="inherit"
 							>
-								{/* Add an icon here, such as a menu icon */}
+								<MenuIcon />
 							</IconButton>
 							<Menu
 								id="menu-appbar"
@@ -189,12 +191,7 @@ export default function Navigation() {
 								<Button
 									key={page}
 									onClick={handleCloseNavMenu}
-									sx={{
-										my: 2,
-										color: theme.palette.primary
-											.contrastText,
-										display: "block",
-									}}
+									sx={navBoxItemStyles}
 								>
 									{page}
 								</Button>
