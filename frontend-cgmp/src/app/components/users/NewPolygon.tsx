@@ -13,6 +13,8 @@ import {
 import { ICreatePolygon, IPolygon } from "@/app/models";
 import { useState } from "react";
 import axios from "axios";
+import { MapMouseEvent, Map as MapboxMap } from "mapbox-gl";
+import { mapBoxStyles } from "./PolygonListStyles";
 
 const accessToken =
 	"pk.eyJ1Ijoiem9ra3kyZSIsImEiOiJjbTAxMThhMTYxbHBmMnJzYjR1eGxmZHBoIn0.wzqyHNfMopK1YzvpNIWUIg";
@@ -44,12 +46,14 @@ interface CreatePolygonProps {
 	oldPolygons: IPolygon[];
 	center: number[];
 	onAddSuccess: () => void;
+	onCenterChanged: (center?: number[]) => void;
 }
 
 const defaultCreatePolygonProps: CreatePolygonProps = {
 	oldPolygons: [],
 	center: [0, 0],
 	onAddSuccess: () => {},
+	onCenterChanged: () => {},
 };
 
 export default function NewPolygon(
@@ -73,7 +77,6 @@ export default function NewPolygon(
 				geometry: event.features[0].geometry,
 			},
 		};
-		console.log(newPolygon);
 		newPolygon.name = "";
 		setCurrentNewPolygon(newPolygon);
 		handleOpen();
@@ -101,8 +104,15 @@ export default function NewPolygon(
 			});
 	};
 
+	const handleLayerClick = (center?: number[]) => {
+		console.log(center);
+		if (center && center.length == 2) {
+			props.onCenterChanged(center);
+		}
+	};
+
 	return (
-		<Container maxWidth="md">
+		<Container sx={mapBoxStyles}>
 			<Map
 				style={style}
 				containerStyle={mapStyle}
@@ -137,6 +147,7 @@ export default function NewPolygon(
 									type: "FeatureCollection",
 									features: [polygon.geo_json],
 								}}
+								onClick={() => handleLayerClick(polygon.center)}
 							/>
 						);
 					})}

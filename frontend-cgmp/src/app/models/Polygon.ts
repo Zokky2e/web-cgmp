@@ -19,3 +19,11 @@ export interface ICreatePolygon {
 	features: IFeature[];
 	name: string;
 }
+
+export interface IRequestedPolygon {
+	_id: string;
+	polygonId: string;
+	userId: string;
+	timestamp: string;
+	__v: number;
+}

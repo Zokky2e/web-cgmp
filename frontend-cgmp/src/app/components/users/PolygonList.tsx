@@ -16,13 +16,16 @@ import {
 	Box,
 	TablePagination,
 	TablePaginationProps,
+	Tooltip,
 } from "@mui/material";
 import NewPolygon from "./NewPolygon";
-import { IPolygon } from "@/app/models";
+import { IPolygon, IRequestedPolygon } from "@/app/models";
 import {
 	StyledTableRow,
 	containerStyles,
 	boxStyles,
+	gridContainerStyles,
+	tableBoxStyles,
 } from "./PolygonListStyles"; // Import styles
 import { theme } from "@/app/layout";
 
@@ -35,10 +38,27 @@ export default function PolygonList() {
 	const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 	const [totalPages, setTotalPages] = useState<number>(0);
 	const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(0);
-
+	const [requestedPolygons, setRequestedPolygons] = useState<
+		IRequestedPolygon[]
+	>([]);
+	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 	useEffect(() => {
 		fetchPolygons();
+		fetchRequestedPolygons();
 	}, [page, rowsPerPage]);
+
+	useEffect(() => {
+		const checkIfPolygonRequested = () => {
+			const selectedPolygon =
+				data[selectedRowIndex ? selectedRowIndex : 0];
+			if (!selectedPolygon) return false;
+			return requestedPolygons.some(
+				(polygon) => polygon.polygonId === selectedPolygon.id
+			);
+		};
+
+		setIsButtonDisabled(checkIfPolygonRequested());
+	}, [selectedRowIndex, requestedPolygons, data]);
 
 	const fetchPolygons = async () => {
 		setLoading(true);
@@ -77,6 +97,35 @@ export default function PolygonList() {
 		}
 	};
 
+	const fetchRequestedPolygons = async () => {
+		try {
+			const response: AxiosResponse<IPolygon[]> = await axios.get(
+				"http://localhost:3000/api/polygon/requested",
+				{ withCredentials: true }
+			);
+			setRequestedPolygons(response.data); // Update the requested polygons state
+		} catch (error) {
+			console.error("Failed to fetch requested polygons:", error);
+		}
+	};
+
+	const handleRequestPlot = async () => {
+		const selectedPolygon = data[selectedRowIndex ? selectedRowIndex : 0];
+		if (!selectedPolygon) return;
+
+		try {
+			await axios.post(
+				`http://localhost:3000/api/polygon/request/${selectedPolygon.id}`,
+				{},
+				{ withCredentials: true }
+			);
+			// Refresh requested polygons list after making a request
+			fetchRequestedPolygons();
+		} catch (error) {
+			console.error("Failed to request plot:", error);
+		}
+	};
+
 	const handleChangePage: TablePaginationProps["onPageChange"] = (
 		event,
 		newPage
@@ -97,7 +146,7 @@ export default function PolygonList() {
 	};
 
 	return (
-		<Container sx={containerStyles}>
+		<Container sx={gridContainerStyles}>
 			{loading && <CircularProgress />}
 			{error && <Typography color="error">{error}</Typography>}
 			<NewPolygon
@@ -106,8 +155,16 @@ export default function PolygonList() {
 				onAddSuccess={() => {
 					fetchPolygons();
 				}}
+				onCenterChanged={(center?: number[]) => {
+					if (center && center.length == 2) {
+						setCenter(center);
+					}
+				}}
 			/>
-			<Box sx={boxStyles}>
+			<Box sx={tableBoxStyles}>
+				<Typography variant="h4" noWrap component="a">
+					Available plots
+				</Typography>
 				<TableContainer component={Paper}>
 					<Table>
 						<TableHead>
@@ -168,6 +225,32 @@ export default function PolygonList() {
 					rowsPerPage={rowsPerPage}
 					onRowsPerPageChange={handleChangeRowsPerPage}
 				/>
+				<Box
+					sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}
+				>
+					<Tooltip
+						title={isButtonDisabled ? "Already Requested" : ""}
+						disableHoverListener={!isButtonDisabled}
+					>
+						<span>
+							{" "}
+							{/* Wrapper to ensure tooltip works on disabled button */}
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={handleRequestPlot}
+								disabled={isButtonDisabled}
+								style={{
+									pointerEvents: isButtonDisabled
+										? "none"
+										: "auto",
+								}} // Prevents interaction with disabled button
+							>
+								Request Plot
+							</Button>
+						</span>
+					</Tooltip>
+				</Box>
 			</Box>
 		</Container>
 	);
