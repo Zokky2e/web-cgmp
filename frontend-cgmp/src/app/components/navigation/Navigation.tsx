@@ -32,7 +32,11 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { theme } from "@/app/layout";
 
-const pages = ["Plots", "Tools", "Forum"];
+const pages = [
+	{ title: "Plots", url: "/plots" },
+	{ title: "Tools", url: "/tools" },
+	{ title: "Forum", url: "/forum" },
+];
 const settings = [
 	{ title: "Login", url: "/login" },
 	{ title: "Register", url: "/register" },
@@ -59,7 +63,8 @@ export default function Navigation() {
 				if (!response.data.isAuthenticated) {
 					if (
 						location.pathname !== "/login" &&
-						location.pathname !== "/register"
+						location.pathname !== "/register" &&
+						location.pathname !== "/"
 					) {
 						window.location.href = "/login";
 					}
@@ -87,6 +92,11 @@ export default function Navigation() {
 
 	const handleCloseUserMenu = () => {
 		setAnchorElUser(null);
+	};
+
+	const handleNavigationToPage = (pageUrl: string) => {
+		window.location.href = pageUrl;
+		handleCloseNavMenu();
 	};
 
 	const handleLogout = async () => {
@@ -160,11 +170,13 @@ export default function Navigation() {
 							>
 								{pages.map((page) => (
 									<MenuItem
-										key={page}
-										onClick={handleCloseNavMenu}
+										key={page.title}
+										onClick={() => {
+											handleNavigationToPage(page.url);
+										}}
 									>
 										<Typography textAlign="center">
-											{page}
+											{page.title}
 										</Typography>
 									</MenuItem>
 								))}
@@ -189,11 +201,13 @@ export default function Navigation() {
 						<Box sx={navBoxStyles}>
 							{pages.map((page) => (
 								<Button
-									key={page}
-									onClick={handleCloseNavMenu}
+									key={page.title}
+									onClick={() => {
+										handleNavigationToPage(page.url);
+									}}
 									sx={navBoxItemStyles}
 								>
-									{page}
+									{page.title}
 								</Button>
 							))}
 						</Box>

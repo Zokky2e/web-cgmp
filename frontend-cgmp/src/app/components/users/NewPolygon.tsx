@@ -45,6 +45,7 @@ const popupStyle = {
 interface CreatePolygonProps {
 	oldPolygons: IPolygon[];
 	center: number[];
+	showAddButton: boolean;
 	onAddSuccess: () => void;
 	onCenterChanged: (center?: number[]) => void;
 }
@@ -52,6 +53,7 @@ interface CreatePolygonProps {
 const defaultCreatePolygonProps: CreatePolygonProps = {
 	oldPolygons: [],
 	center: [0, 0],
+	showAddButton: false,
 	onAddSuccess: () => {},
 	onCenterChanged: () => {},
 };
@@ -153,14 +155,16 @@ export default function NewPolygon(
 					})}
 				</>
 			</Map>
-			<Button
-				variant="contained"
-				onClick={() => {
-					addNewPolygons();
-				}}
-			>
-				Add
-			</Button>
+			{props.showAddButton && (
+				<Button
+					variant="contained"
+					onClick={() => {
+						addNewPolygons();
+					}}
+				>
+					Add
+				</Button>
+			)}
 			<Modal
 				open={open}
 				onClose={handleClose}
