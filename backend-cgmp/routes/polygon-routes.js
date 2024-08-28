@@ -7,5 +7,14 @@ router.get("/polygon", polygonController.getPolygons);
 router.get("/polygon/:id/:x/:y/:z", polygonController.getPolygonById);
 router.get("/polygon/:id/:created_at", polygonController.getPolygonById);
 router.post("/polygon", isAuthenticated, polygonController.postPolygons);
-
+router.get(
+	"/polygon/requested",
+	isAuthenticated,
+	polygonController.getRequestedPolygons
+);
+router.post(
+	"/polygon/request/:id",
+	isAuthenticated,
+	polygonController.requestPolygon
+);
 module.exports = router;

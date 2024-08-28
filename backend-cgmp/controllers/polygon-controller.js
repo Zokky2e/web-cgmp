@@ -1,6 +1,8 @@
 const axios = require("axios");
 const _ = require("underscore");
 const Polygon = require("../models/polygon");
+const RequestedPolygon = require("../models/requestedPolygon"); // Import the model
+
 exports.getPolygons = async (req, res) => {
 	const page = parseInt(req.query.page, 10) || 1;
 	const limit = parseInt(req.query.limit, 10) || 10;
@@ -13,13 +15,21 @@ exports.getPolygons = async (req, res) => {
 		const polygons = response.data;
 
 		// Slice the array to implement pagination
-		const paginatedPolygons = polygons.slice(skip, skip + limit);
 
+		// Get all polygonIds that are already taken from the Polygon table
+		const takenPolygons = await Polygon.find({}, "polygonId");
+		const takenPolygonIds = new Set(takenPolygons.map((p) => p.polygonId));
+
+		const availablePolygons = polygons.filter(
+			(polygon) => !takenPolygonIds.has(polygon.id)
+		);
+
+		const paginatedPolygons = availablePolygons.slice(skip, skip + limit);
 		res.status(200).json({
 			total: polygons.length,
 			page,
 			limit,
-			totalPages: Math.ceil(polygons.length / limit),
+			totalPages: Math.ceil(availablePolygons.length / limit),
 			data: paginatedPolygons,
 		});
 	} catch (error) {
@@ -60,31 +70,91 @@ exports.getPolygonById = async (req, res) => {
 			res.status(400).json({ message: error.message });
 		});
 };
+//OLD postPolygon
+// exports.postPolygons = async (req, res) => {
+// 	try {
+// 		const userId = req.user.id;
+// 		const polygons = req.body;
+// 		//console.log(req.body);
+// 		const savedPolygons = await Promise.all(
+// 			polygons.map(async (polygonData) => {
+// 				const polygon = new Polygon({
+// 					userId,
+// 					polygonId: polygonData.id,
+// 					createdAt: new Date(polygonData.created_at),
+// 				});
+// 				console.log(polygon);
+// 				const url = `http://api.agromonitoring.com/agro/1.0/polygons?appid=${process.env.agromonitoring_api_key}`;
+// 				await axios
+// 					.post(url, polygonData)
+// 					.then(async (r) => {
+// 						polygon.polygonId = r.data.id;
+// 						await polygon.save();
+// 					})
+// 					.catch((err) => console.log(err));
+// 			})
+// 		);
+// 		res.status(201).json(savedPolygons);
+// 	} catch (error) {
+// 		res.status(400).json({ message: error.message });
+// 	}
+// };
 
 exports.postPolygons = async (req, res) => {
 	try {
-		const userId = req.user.id;
 		const polygons = req.body;
-		//console.log(req.body);
 		const savedPolygons = await Promise.all(
 			polygons.map(async (polygonData) => {
-				const polygon = new Polygon({
-					userId,
-					polygonId: polygonData.id,
-					createdAt: new Date(polygonData.created_at),
-				});
-				console.log(polygon);
 				const url = `http://api.agromonitoring.com/agro/1.0/polygons?appid=${process.env.agromonitoring_api_key}`;
-				await axios
-					.post(url, polygonData)
-					.then(async (r) => {
-						polygon.polygonId = r.data.id;
-						await polygon.save();
-					})
-					.catch((err) => console.log(err));
+				const response = await axios.post(url, polygonData);
+				return response.data;
 			})
 		);
 		res.status(201).json(savedPolygons);
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
+
+exports.getRequestedPolygons = async (req, res) => {
+	try {
+		const userId = req.user.id;
+
+		const requestedPolygons = await RequestedPolygon.find({ userId });
+
+		res.status(200).json(requestedPolygons);
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
+
+exports.requestPolygon = async (req, res) => {
+	try {
+		const userId = req.user.id;
+		const polygonId = req.params.id;
+
+		const existingRequest = await RequestedPolygon.findOne({
+			polygonId,
+			userId,
+		});
+
+		if (existingRequest) {
+			return res.status(400).json({
+				message:
+					"Request for this polygon has already been made by the user.",
+			});
+		}
+
+		const requestedPolygon = new RequestedPolygon({
+			polygonId,
+			userId,
+		});
+
+		await requestedPolygon.save();
+
+		res.status(201).json({
+			message: "Polygon request saved successfully.",
+		});
 	} catch (error) {
 		res.status(400).json({ message: error.message });
 	}
