@@ -7,6 +7,7 @@ export const appBarStyles: SxProps<Theme> = {
 
 export const toolbarStyles: SxProps<Theme> = {
 	display: { md: "flex" },
+	justifyContent: "space-between",
 };
 
 export const logoStyles: SxProps<Theme> = {

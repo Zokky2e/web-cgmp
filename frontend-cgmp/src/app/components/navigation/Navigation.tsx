@@ -1,5 +1,5 @@
-"use client"; // Mark this component as a Client Component
-
+// Navigation.tsx
+"use client";
 import { useEffect, useState, MouseEvent } from "react";
 import {
 	AppBar,
@@ -17,7 +17,6 @@ import {
 	Link,
 } from "@mui/material";
 import { useTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios";
 import {
 	appBarStyles,
 	toolbarStyles,
@@ -31,6 +30,8 @@ import {
 } from "./NavigationStyles";
 import MenuIcon from "@mui/icons-material/Menu";
 import { theme } from "@/app/layout";
+import { useUser } from "@/app/contexts/UserContext";
+import axios from "axios";
 
 const pages = [
 	{ title: "Plots", url: "/plots" },
@@ -44,39 +45,10 @@ const settings = [
 
 export default function Navigation() {
 	const isLargeScreen = useMediaQuery("(min-width:1440px)");
+	const { user, isAuthenticated } = useUser();
 
 	const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 	const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-	const [isAuthenticated, setIsAuthenticated] = useState(false);
-	const [user, setUser] = useState(null);
-
-	useEffect(() => {
-		async function checkAuthStatus() {
-			try {
-				const response = await axios.get(
-					"http://localhost:3000/api/user/status",
-					{ withCredentials: true }
-				);
-				setIsAuthenticated(response.data.isAuthenticated);
-				setUser(response.data.user);
-
-				if (!response.data.isAuthenticated) {
-					if (
-						location.pathname !== "/login" &&
-						location.pathname !== "/register" &&
-						location.pathname !== "/"
-					) {
-						window.location.href = "/login";
-					}
-				}
-			} catch (error) {
-				console.error("Error checking auth status:", error);
-				window.location.href = "/login";
-			}
-		}
-
-		checkAuthStatus();
-	}, [location.pathname]);
 
 	const handleOpenNavMenu = (event: MouseEvent<HTMLElement>) => {
 		setAnchorElNav(event.currentTarget);
@@ -106,8 +78,6 @@ export default function Navigation() {
 				{},
 				{ withCredentials: true }
 			);
-			setIsAuthenticated(false);
-			setUser(null);
 			window.location.href = "/login";
 		} catch (error) {
 			console.error("Error logging out:", error);
@@ -197,21 +167,23 @@ export default function Navigation() {
 								? "Community Garden Management Platform"
 								: "CGMP"}
 						</Typography>
-
-						<Box sx={navBoxStyles}>
-							{pages.map((page) => (
-								<Button
-									key={page.title}
-									onClick={() => {
-										handleNavigationToPage(page.url);
-									}}
-									sx={navBoxItemStyles}
-								>
-									{page.title}
-								</Button>
-							))}
-						</Box>
-
+						{isAuthenticated ? (
+							<Box sx={navBoxStyles}>
+								{pages.map((page) => (
+									<Button
+										key={page.title}
+										onClick={() => {
+											handleNavigationToPage(page.url);
+										}}
+										sx={navBoxItemStyles}
+									>
+										{page.title}
+									</Button>
+								))}
+							</Box>
+						) : (
+							""
+						)}
 						<Box sx={avatarBoxStyles}>
 							<Tooltip title="Open settings">
 								<IconButton
