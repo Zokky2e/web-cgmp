@@ -83,9 +83,34 @@ exports.createUser = async (req, res) => {
 
 // Read all users
 exports.getAllUsers = async (req, res) => {
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit, 10) || 10;
+	const skip = (page - 1) * limit;
+
+	const searchQuery = req.query.searchQuery || ""; // Single search query parameter
+
 	try {
-		const users = await User.find();
-		res.status(200).json(users);
+		// Build the search query
+		const query = {};
+
+		if (searchQuery) {
+			query.$or = [
+				{ email: { $regex: searchQuery, $options: "i" } },
+				{ firstName: { $regex: searchQuery, $options: "i" } },
+				{ lastName: { $regex: searchQuery, $options: "i" } },
+			];
+		}
+		const users = await User.find(query).skip(skip).limit(limit);
+
+		const totalUsers = await User.countDocuments(query);
+
+		res.status(200).json({
+			total: totalUsers,
+			page,
+			limit,
+			totalPages: Math.ceil(totalUsers / limit),
+			data: users,
+		});
 	} catch (error) {
 		res.status(500).json({ message: error.message });
 	}
