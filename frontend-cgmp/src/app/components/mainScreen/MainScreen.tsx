@@ -38,6 +38,9 @@ export default function MainScreen() {
 					variant="contained"
 					color="primary"
 					sx={{ mt: 2, px: 4 }}
+					onClick={() => {
+						window.location.href = "/plots";
+					}}
 				>
 					Get Started
 				</Button>
@@ -45,7 +48,7 @@ export default function MainScreen() {
 
 			{/* Features Section */}
 			<Grid container spacing={2} sx={{ py: { xs: 2, md: 4 } }}>
-				<Grid item xs={12} sm={6} md={4}>
+				<Grid xs={12} sm={6} md={4}>
 					<Box sx={featureBoxStyles}>
 						<Typography variant="h6" gutterBottom>
 							Easy Plot Requests
@@ -56,7 +59,7 @@ export default function MainScreen() {
 						</Typography>
 					</Box>
 				</Grid>
-				<Grid item xs={12} sm={6} md={4}>
+				<Grid xs={12} sm={6} md={4}>
 					<Box sx={featureBoxStyles}>
 						<Typography variant="h6" gutterBottom>
 							Plot Details & Weather Reports
@@ -68,7 +71,7 @@ export default function MainScreen() {
 						</Typography>
 					</Box>
 				</Grid>
-				<Grid item xs={12} sm={6} md={4}>
+				<Grid xs={12} sm={6} md={4}>
 					<Box sx={featureBoxStyles}>
 						<Typography variant="h6" gutterBottom>
 							Connect with Other Farmers
