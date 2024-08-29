@@ -18,8 +18,11 @@ export const StyledTableRow = styled(TableRow)<{ selected: boolean }>(
 		},
 	})
 );
-export const containerStyles: SxProps<Theme> = {
-	maxWidth: "md",
+export const CircleLoaderStyles: SxProps<Theme> = {
+	margin: "150px",
+	display: "flex",
+	justifyContent: "center",
+	alignItems: "center",
 };
 
 export const boxStyles: SxProps<Theme> = {
@@ -35,6 +38,9 @@ export const gridContainerStyles: SxProps<Theme> = {
 };
 
 export const mapBoxStyles: SxProps<Theme> = {
+	display: "flex",
+	flexDirection: "column",
+	alignItems: "center",
 	width: { xs: "100%", md: "50%" },
 	marginBottom: { xs: 2, md: 0 },
 };

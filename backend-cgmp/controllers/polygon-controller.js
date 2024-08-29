@@ -37,6 +37,18 @@ exports.getPolygons = async (req, res) => {
 	}
 };
 
+exports.getAllPolygons = async (req, res) => {
+	try {
+		const response = await axios.get(
+			`http://api.agromonitoring.com/agro/1.0/polygons?appid=${process.env.agromonitoring_api_key}`
+		);
+		const polygons = response.data;
+		res.status(200).json(polygons);
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
+
 exports.getPolygonById = async (req, res) => {
 	const created_at = parseInt(req.params.created_at, 10);
 	const id = req.params.id;

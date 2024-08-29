@@ -23,7 +23,7 @@ export default function AdminTools() {
 						itemId="polygons"
 						label="Polygons"
 					>
-						<PolygonList />
+						<PolygonList title="Edit plots" />
 					</TreeItem>
 					<TreeItem sx={treeItemStyles} itemId="users" label="Users">
 						<UserList />

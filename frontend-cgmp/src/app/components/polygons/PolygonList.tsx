@@ -21,16 +21,19 @@ import {
 import NewPolygon from "./NewPolygon";
 import { IPolygon, IRequestedPolygon } from "@/app/models";
 import {
+	CircleLoaderStyles,
 	StyledTableRow,
-	containerStyles,
-	boxStyles,
 	gridContainerStyles,
 	tableBoxStyles,
 } from "./PolygonListStyles"; // Import styles
 import { theme } from "@/app/layout";
 import { useUser } from "@/app/contexts/UserContext";
 
-export default function PolygonList() {
+interface PolygonListProps {
+	title: string;
+}
+
+export default function PolygonList(props: PolygonListProps) {
 	const [data, setData] = useState<IPolygon[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
@@ -45,8 +48,10 @@ export default function PolygonList() {
 	const { user, isAuthenticated } = useUser();
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 	useEffect(() => {
-		fetchPolygons();
-		fetchRequestedPolygons();
+		fetchPagedPolygons();
+		if (user?.job == "farmer") {
+			fetchRequestedPolygons();
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [page, rowsPerPage]);
 
@@ -63,14 +68,14 @@ export default function PolygonList() {
 		setIsButtonDisabled(checkIfPolygonRequested());
 	}, [selectedRowIndex, requestedPolygons, data]);
 
-	const fetchPolygons = async () => {
+	const fetchPagedPolygons = async () => {
 		setLoading(true);
 		try {
 			const response: AxiosResponse<{
 				data: IPolygon[];
 				totalPages: number;
 			}> = await axios.get(
-				`http://localhost:3000/api/polygon?page=${
+				`http://localhost:3000/api/pagedPolygon?page=${
 					page + 1
 				}&limit=${rowsPerPage}`
 			);
@@ -150,121 +155,155 @@ export default function PolygonList() {
 
 	return (
 		<Container sx={gridContainerStyles}>
-			{loading && <CircularProgress />}
 			{error && <Typography color="error">{error}</Typography>}
-			<NewPolygon
-				center={center}
-				oldPolygons={data}
-				showAddButton={
-					user != null &&
-					(user.job == "manager" || user.job == "admin")
-				}
-				onAddSuccess={() => {
-					fetchPolygons();
-				}}
-				onCenterChanged={(center?: number[]) => {
-					if (center && center.length == 2) {
-						setCenter(center);
-					}
-				}}
-			/>
-			<Box sx={tableBoxStyles}>
-				<Typography variant="h4" noWrap component="a">
-					Available plots
-				</Typography>
-				<TableContainer component={Paper}>
-					<Table>
-						<TableHead>
-							<TableRow>
-								<TableCell>Field Name</TableCell>
-								<TableCell align="right">Area</TableCell>
-								<TableCell align="right">Center</TableCell>
-								<TableCell align="right">Created At</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{data.map((row, index) => (
-								<StyledTableRow
-									theme={theme}
-									key={
-										row.id
-											? (row.id as React.Key)
-											: (index as React.Key)
-									}
-									selected={index === selectedRowIndex}
-									onClick={() =>
-										handleRowClick(
-											index,
-											row.center ? row.center : [0, 0]
-										)
-									}
-								>
-									<TableCell component="th" scope="row">
-										{row.name}
-									</TableCell>
-									<TableCell align="right">
-										{row.area ? row.area.toFixed(4) : "0"}
-									</TableCell>
-									<TableCell align="right">
-										{row.center
-											? `${row.center[0].toFixed(
-													4
-											  )}, ${row.center[1].toFixed(4)}`
-											: "[0, 0]"}
-									</TableCell>
-									<TableCell align="right">
-										{row.created_at
-											? new Date(
-													Number(row.created_at)
-											  ).toUTCString()
-											: new Date().toUTCString()}
-									</TableCell>
-								</StyledTableRow>
-							))}
-						</TableBody>
-					</Table>
-				</TableContainer>
-				<TablePagination
-					component="div"
-					count={totalPages * rowsPerPage}
-					page={page}
-					onPageChange={handleChangePage}
-					rowsPerPage={rowsPerPage}
-					rowsPerPageOptions={[6, 10, 25, 100]}
-					onRowsPerPageChange={handleChangeRowsPerPage}
-				/>
-				<Box
-					sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}
-				>
-					<Tooltip
-						title={isButtonDisabled ? "Already Requested" : ""}
-						disableHoverListener={!isButtonDisabled}
-					>
-						<span>
-							{" "}
-							{user?.job == "farmer" ? (
-								<Button
-									variant="contained"
-									color="primary"
-									onClick={handleRequestPlot}
-									disabled={isButtonDisabled}
-									style={{
-										pointerEvents: isButtonDisabled
-											? "none"
-											: "auto",
-									}} // Prevents interaction with disabled button
-								>
-									Request Plot
-								</Button>
-							) : (
-								<Button variant="contained" color="primary">
-									Delete Plot
-								</Button>
-							)}
-						</span>
-					</Tooltip>
+			{loading ? (
+				<Box sx={CircleLoaderStyles}>
+					<CircularProgress />
 				</Box>
-			</Box>
+			) : (
+				<>
+					<NewPolygon
+						center={center}
+						showAddButton={
+							user != null &&
+							(user.job == "manager" || user.job == "admin")
+						}
+						onAddSuccess={() => {
+							fetchPagedPolygons();
+						}}
+						onCenterChanged={(center?: number[]) => {
+							if (center && center.length == 2) {
+								setCenter(center);
+							}
+						}}
+					/>
+					<Box sx={tableBoxStyles}>
+						<Typography variant="h4" noWrap component="a">
+							{props.title}
+						</Typography>
+						<TableContainer component={Paper}>
+							<Table>
+								<TableHead>
+									<TableRow>
+										<TableCell>Field Name</TableCell>
+										<TableCell align="right">
+											Area
+										</TableCell>
+										<TableCell align="right">
+											Center
+										</TableCell>
+										<TableCell align="right">
+											Created At
+										</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{data.map((row, index) => (
+										<StyledTableRow
+											theme={theme}
+											key={
+												row.id
+													? (row.id as React.Key)
+													: (index as React.Key)
+											}
+											selected={
+												index === selectedRowIndex
+											}
+											onClick={() =>
+												handleRowClick(
+													index,
+													row.center
+														? row.center
+														: [0, 0]
+												)
+											}
+										>
+											<TableCell
+												component="th"
+												scope="row"
+											>
+												{row.name}
+											</TableCell>
+											<TableCell align="right">
+												{row.area
+													? row.area.toFixed(4)
+													: "0"}
+											</TableCell>
+											<TableCell align="right">
+												{row.center
+													? `${row.center[0].toFixed(
+															4
+													  )}, ${row.center[1].toFixed(
+															4
+													  )}`
+													: "[0, 0]"}
+											</TableCell>
+											<TableCell align="right">
+												{row.created_at
+													? new Date(
+															Number(
+																row.created_at
+															)
+													  ).toUTCString()
+													: new Date().toUTCString()}
+											</TableCell>
+										</StyledTableRow>
+									))}
+								</TableBody>
+							</Table>
+						</TableContainer>
+						<TablePagination
+							component="div"
+							count={totalPages * rowsPerPage}
+							page={page}
+							onPageChange={handleChangePage}
+							rowsPerPage={rowsPerPage}
+							rowsPerPageOptions={[6, 10, 25, 100]}
+							onRowsPerPageChange={handleChangeRowsPerPage}
+						/>
+						<Box
+							sx={{
+								mt: 2,
+								display: "flex",
+								justifyContent: "flex-end",
+							}}
+						>
+							<Tooltip
+								title={
+									isButtonDisabled ? "Already Requested" : ""
+								}
+								disableHoverListener={!isButtonDisabled}
+							>
+								<span>
+									{" "}
+									{user?.job == "farmer" ? (
+										<Button
+											variant="contained"
+											color="primary"
+											onClick={handleRequestPlot}
+											disabled={isButtonDisabled}
+											style={{
+												pointerEvents: isButtonDisabled
+													? "none"
+													: "auto",
+											}} // Prevents interaction with disabled button
+										>
+											Request Plot
+										</Button>
+									) : (
+										<Button
+											variant="contained"
+											color="primary"
+										>
+											Delete Plot
+										</Button>
+									)}
+								</span>
+							</Tooltip>
+						</Box>
+					</Box>
+				</>
+			)}
 		</Container>
 	);
 }

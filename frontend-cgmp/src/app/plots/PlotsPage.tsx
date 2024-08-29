@@ -6,7 +6,7 @@ import { theme } from "../layout";
 export default function PlotsPage() {
 	return (
 		<ThemeProvider theme={theme}>
-			<PolygonList />
+			<PolygonList title="Available plots" />
 		</ThemeProvider>
 	);
 }

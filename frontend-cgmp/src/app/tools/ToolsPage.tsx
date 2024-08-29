@@ -5,6 +5,8 @@ import { useUser } from "../contexts/UserContext";
 import PolygonList from "../components/polygons/PolygonList";
 import UserList from "../components/admin/UserList";
 import AdminTools from "../components/admin/AdminTools";
+import { Box, CircularProgress } from "@mui/material";
+import { CircleLoaderStyles } from "../components/polygons/PolygonListStyles";
 
 export default function ToolsPage() {
 	const { user, isAuthenticated } = useUser();
@@ -15,7 +17,7 @@ export default function ToolsPage() {
 				case "manager":
 					return (
 						<>
-							<PolygonList />
+							<PolygonList title="Manage plots" />
 						</>
 					);
 					break;
@@ -31,7 +33,11 @@ export default function ToolsPage() {
 					break;
 			}
 		}
-		return "<></>";
+		return (
+			<Box sx={CircleLoaderStyles}>
+				<CircularProgress />
+			</Box>
+		);
 	};
 
 	return <ThemeProvider theme={theme}>{renderSwitch()}</ThemeProvider>;

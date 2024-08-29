@@ -11,8 +11,8 @@ import {
 	Typography,
 } from "@mui/material";
 import { ICreatePolygon, IPolygon } from "@/app/models";
-import { useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { MapMouseEvent, Map as MapboxMap } from "mapbox-gl";
 import { mapBoxStyles } from "./PolygonListStyles";
 import { useUser } from "@/app/contexts/UserContext";
@@ -44,7 +44,6 @@ const popupStyle = {
 };
 
 interface CreatePolygonProps {
-	oldPolygons: IPolygon[];
 	center: number[];
 	showAddButton: boolean;
 	onAddSuccess: () => void;
@@ -52,7 +51,6 @@ interface CreatePolygonProps {
 }
 
 const defaultCreatePolygonProps: CreatePolygonProps = {
-	oldPolygons: [],
 	center: [0, 0],
 	showAddButton: false,
 	onAddSuccess: () => {},
@@ -62,12 +60,43 @@ const defaultCreatePolygonProps: CreatePolygonProps = {
 export default function NewPolygon(
 	props: CreatePolygonProps = defaultCreatePolygonProps
 ) {
+	const [oldPolygons, setOldPolygons] = useState<IPolygon[]>([]);
 	const [open, setOpen] = useState(false);
 	const [newPolygons, setNewPolygons] = useState<IPolygon[]>([]);
+	const [error, setError] = useState<string | null>(null);
 	const [currentNewPolygon, setCurrentNewPolygon] = useState<IPolygon>({
 		name: "",
 	});
 
+	useEffect(() => {
+		fetchPolygons();
+	}, [newPolygons]);
+
+	const fetchPolygons = async () => {
+		try {
+			const response: AxiosResponse<IPolygon[]> = await axios.get(
+				`http://localhost:3000/api/polygon`
+			);
+
+			const processedData = response.data.map((polygon) => {
+				if (
+					polygon.created_at &&
+					Number(polygon.created_at) < 1000000000000
+				) {
+					return {
+						...polygon,
+						created_at: Number(polygon.created_at) * 1000,
+					};
+				}
+				return polygon;
+			});
+
+			setOldPolygons(processedData);
+		} catch (error) {
+			const axiosError = error as AxiosError;
+			setError(axiosError.message);
+		}
+	};
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
 
@@ -116,6 +145,7 @@ export default function NewPolygon(
 
 	return (
 		<Container sx={mapBoxStyles}>
+			{error && <Typography color="error">{error}</Typography>}
 			<Map
 				style={style}
 				containerStyle={mapStyle}
@@ -132,7 +162,7 @@ export default function NewPolygon(
 						}}
 						onDrawCreate={onDrawCreate}
 					/>
-					{props.oldPolygons.map((polygon, index) => {
+					{oldPolygons.map((polygon, index) => {
 						const isSelected =
 							JSON.stringify(polygon.center) ===
 							JSON.stringify(props.center);
@@ -143,7 +173,6 @@ export default function NewPolygon(
 									"fill-color": isSelected
 										? "rgba(204, 255, 0, 0.3)"
 										: "rgba(128, 0, 128, 0.3)",
-									"fill-outline-width": "2px",
 									"fill-outline-color": "#000",
 								}}
 								data={{
@@ -158,12 +187,16 @@ export default function NewPolygon(
 			</Map>
 			{props.showAddButton && (
 				<Button
+					sx={{
+						marginTop: "16px",
+						alignSelf: "flex-end",
+					}}
 					variant="contained"
 					onClick={() => {
 						addNewPolygons();
 					}}
 				>
-					Add
+					Add New fields
 				</Button>
 			)}
 			<Modal
