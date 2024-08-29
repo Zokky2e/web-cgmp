@@ -1,3 +1,4 @@
+// layout.tsx
 "use client";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -6,6 +7,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Navigation from "./components/navigation/Navigation";
 import { createTheme } from "@mui/material/styles";
 import Footer from "./components/footer/Footer";
+import { UserProvider } from "./contexts/UserContext";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const theme = createTheme({
@@ -44,11 +47,15 @@ export default function RootLayout({
 				/>
 			</head>
 			<body className={inter.className}>
-				<div>
-					<Navigation />
-					{children}
-				</div>
-				<Footer />
+				<UserProvider>
+					{" "}
+					{/* Wrap your app with the UserProvider */}
+					<div>
+						<Navigation />
+						{children}
+					</div>
+					<Footer />
+				</UserProvider>
 			</body>
 		</html>
 	);
