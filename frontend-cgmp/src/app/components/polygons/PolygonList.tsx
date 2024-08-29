@@ -28,6 +28,7 @@ import {
 	tableBoxStyles,
 } from "./PolygonListStyles"; // Import styles
 import { theme } from "@/app/layout";
+import { useUser } from "@/app/contexts/UserContext";
 
 export default function PolygonList() {
 	const [data, setData] = useState<IPolygon[]>([]);
@@ -35,20 +36,22 @@ export default function PolygonList() {
 	const [error, setError] = useState<string | null>(null);
 	const [center, setCenter] = useState<number[]>([0, 0]);
 	const [page, setPage] = useState<number>(0);
-	const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+	const [rowsPerPage, setRowsPerPage] = useState<number>(6);
 	const [totalPages, setTotalPages] = useState<number>(0);
 	const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(0);
 	const [requestedPolygons, setRequestedPolygons] = useState<
 		IRequestedPolygon[]
 	>([]);
+	const { user, isAuthenticated } = useUser();
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 	useEffect(() => {
 		fetchPolygons();
 		fetchRequestedPolygons();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [page, rowsPerPage]);
 
 	useEffect(() => {
-		const checkIfPolygonRequested = () => {
+		const checkIfPolygonRequested = (): boolean => {
 			const selectedPolygon =
 				data[selectedRowIndex ? selectedRowIndex : 0];
 			if (!selectedPolygon) return false;
@@ -99,10 +102,10 @@ export default function PolygonList() {
 
 	const fetchRequestedPolygons = async () => {
 		try {
-			const response: AxiosResponse<IPolygon[]> = await axios.get(
-				"http://localhost:3000/api/polygon/requested",
-				{ withCredentials: true }
-			);
+			const response: AxiosResponse<IRequestedPolygon[]> =
+				await axios.get("http://localhost:3000/api/polygon/requested", {
+					withCredentials: true,
+				});
 			setRequestedPolygons(response.data); // Update the requested polygons state
 		} catch (error) {
 			console.error("Failed to fetch requested polygons:", error);
@@ -152,6 +155,10 @@ export default function PolygonList() {
 			<NewPolygon
 				center={center}
 				oldPolygons={data}
+				showAddButton={
+					user != null &&
+					(user.job == "manager" || user.job == "admin")
+				}
 				onAddSuccess={() => {
 					fetchPolygons();
 				}}
@@ -223,6 +230,7 @@ export default function PolygonList() {
 					page={page}
 					onPageChange={handleChangePage}
 					rowsPerPage={rowsPerPage}
+					rowsPerPageOptions={[6, 10, 25, 100]}
 					onRowsPerPageChange={handleChangeRowsPerPage}
 				/>
 				<Box
@@ -234,20 +242,25 @@ export default function PolygonList() {
 					>
 						<span>
 							{" "}
-							{/* Wrapper to ensure tooltip works on disabled button */}
-							<Button
-								variant="contained"
-								color="primary"
-								onClick={handleRequestPlot}
-								disabled={isButtonDisabled}
-								style={{
-									pointerEvents: isButtonDisabled
-										? "none"
-										: "auto",
-								}} // Prevents interaction with disabled button
-							>
-								Request Plot
-							</Button>
+							{user?.job == "farmer" ? (
+								<Button
+									variant="contained"
+									color="primary"
+									onClick={handleRequestPlot}
+									disabled={isButtonDisabled}
+									style={{
+										pointerEvents: isButtonDisabled
+											? "none"
+											: "auto",
+									}} // Prevents interaction with disabled button
+								>
+									Request Plot
+								</Button>
+							) : (
+								<Button variant="contained" color="primary">
+									Delete Plot
+								</Button>
+							)}
 						</span>
 					</Tooltip>
 				</Box>

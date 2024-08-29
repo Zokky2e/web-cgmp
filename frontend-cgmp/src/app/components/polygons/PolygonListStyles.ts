@@ -36,7 +36,6 @@ export const gridContainerStyles: SxProps<Theme> = {
 
 export const mapBoxStyles: SxProps<Theme> = {
 	width: { xs: "100%", md: "50%" },
-	height: "400px",
 	marginBottom: { xs: 2, md: 0 },
 };
 

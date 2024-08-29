@@ -15,6 +15,7 @@ import { useState } from "react";
 import axios from "axios";
 import { MapMouseEvent, Map as MapboxMap } from "mapbox-gl";
 import { mapBoxStyles } from "./PolygonListStyles";
+import { useUser } from "@/app/contexts/UserContext";
 
 const accessToken =
 	"pk.eyJ1Ijoiem9ra3kyZSIsImEiOiJjbTAxMThhMTYxbHBmMnJzYjR1eGxmZHBoIn0.wzqyHNfMopK1YzvpNIWUIg";
