@@ -26,6 +26,9 @@ app.use(
 		resave: false,
 		saveUninitialized: false,
 		cookie: {
+			httpOnly: true, // Helps prevent cross-site scripting attacks
+			secure: process.env.NODE_ENV === "production", // Ensures the cookie is only sent over HTTPS
+			sameSite: "lax", // Controls whether cookies are sent with cross-site requests
 			maxAge: 1000 * 60 * 60 * 24,
 		},
 	})
