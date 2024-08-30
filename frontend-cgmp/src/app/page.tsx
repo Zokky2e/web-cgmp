@@ -1,6 +1,6 @@
 "use client"; // Mark this component as a Client Component
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "./layout";
+import theme from "@/app/theme";
 import MainScreen from "./components/mainScreen/MainScreen";
 
 export default function Home() {
