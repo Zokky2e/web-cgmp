@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "@/app/layout";
+import theme from "@/app/theme";
 import UserList from "./UserList";
 import PolygonList from "../polygons/PolygonList";
 import { Box } from "@mui/material";

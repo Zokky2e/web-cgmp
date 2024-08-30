@@ -25,7 +25,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 		async function checkAuthStatus() {
 			try {
 				const response = await axios.get(
-					"http://localhost:3000/api/user/status",
+					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/status`,
 					{ withCredentials: true }
 				);
 				setIsAuthenticated(response.data.isAuthenticated);

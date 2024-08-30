@@ -13,7 +13,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { orange } from "@mui/material/colors";
-import { theme } from "../layout";
+import theme from "@/app/theme";
 import { useState } from "react";
 import axios from "axios";
 import { Alert } from "@mui/material";
@@ -33,7 +33,7 @@ export default function SignIn() {
 
 		try {
 			const response = await axios.post(
-				"http://localhost:3000/api/login",
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/login`,
 				credentials,
 				{
 					withCredentials: true,

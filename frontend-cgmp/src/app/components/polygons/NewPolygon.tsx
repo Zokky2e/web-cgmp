@@ -75,7 +75,7 @@ export default function NewPolygon(
 	const fetchPolygons = async () => {
 		try {
 			const response: AxiosResponse<IPolygon[]> = await axios.get(
-				`http://localhost:3000/api/polygon`
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon`
 			);
 
 			const processedData = response.data.map((polygon) => {
@@ -125,9 +125,13 @@ export default function NewPolygon(
 			return;
 		}
 		await axios
-			.post(`http://localhost:3000/api/polygon`, newPolygons, {
-				withCredentials: true,
-			})
+			.post(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon`,
+				newPolygons,
+				{
+					withCredentials: true,
+				}
+			)
 			.then(() => {
 				props.onAddSuccess();
 			})

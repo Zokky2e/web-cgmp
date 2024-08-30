@@ -26,7 +26,7 @@ import {
 	gridContainerStyles,
 	tableBoxStyles,
 } from "./PolygonListStyles"; // Import styles
-import { theme } from "@/app/layout";
+import theme from "@/app/theme";
 import { useUser } from "@/app/contexts/UserContext";
 
 interface PolygonListProps {
@@ -75,7 +75,7 @@ export default function PolygonList(props: PolygonListProps) {
 				data: IPolygon[];
 				totalPages: number;
 			}> = await axios.get(
-				`http://localhost:3000/api/pagedPolygon?page=${
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/pagedPolygon?page=${
 					page + 1
 				}&limit=${rowsPerPage}`
 			);
@@ -108,9 +108,12 @@ export default function PolygonList(props: PolygonListProps) {
 	const fetchRequestedPolygons = async () => {
 		try {
 			const response: AxiosResponse<IRequestedPolygon[]> =
-				await axios.get("http://localhost:3000/api/polygon/requested", {
-					withCredentials: true,
-				});
+				await axios.get(
+					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon/requested`,
+					{
+						withCredentials: true,
+					}
+				);
 			setRequestedPolygons(response.data); // Update the requested polygons state
 		} catch (error) {
 			console.error("Failed to fetch requested polygons:", error);
@@ -123,7 +126,7 @@ export default function PolygonList(props: PolygonListProps) {
 
 		try {
 			await axios.post(
-				`http://localhost:3000/api/polygon/request/${selectedPolygon.id}`,
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon/request/${selectedPolygon.id}`,
 				{},
 				{ withCredentials: true }
 			);

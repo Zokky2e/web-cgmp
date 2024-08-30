@@ -17,7 +17,7 @@ import {
 	Tooltip,
 	TextField,
 } from "@mui/material";
-import { theme } from "@/app/layout";
+import theme from "@/app/theme";
 import {
 	StyledUserTableRow,
 	tableContainerStyles,
@@ -47,7 +47,7 @@ export default function UserList() {
 				data: IUser[];
 				totalPages: number;
 			}> = await axios.get(
-				`http://localhost:3000/api/users?page=${
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users?page=${
 					page + 1
 				}&limit=${rowsPerPage}&searchQuery=${searchQuery}`
 			);

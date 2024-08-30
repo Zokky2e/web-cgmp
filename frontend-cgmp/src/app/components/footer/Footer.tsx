@@ -2,7 +2,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "@/app/layout";
+import theme from "@/app/theme";
 import {
 	footerContainerStyles,
 	footerStyles,

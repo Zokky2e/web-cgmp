@@ -1,17 +1,58 @@
+version: '3.8'
+
 services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"  # Expose MongoDB on the default port
+    volumes:
+      - mongo_data:/data/db  # Persist data in a volume
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ./backend-cgmp
+    container_name: backend-cgmp
     command: npx nodemon index.js
     ports:
-      - "3000:3000"  # Adjust based on your backend port
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/your-database-name  # Replace with your actual database name
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./backend-cgmp:/app  # Sync local changes to Docker container
+      - /app/node_modules  # Ignore node_modules folder for syncing
+
   frontend:
     build: ./frontend-cgmp
+    container_name: frontend-cgmp
     command: npm run dev
     ports:
-      - "3001:3001"  # Adjust based on your frontend port
+      - "3001:3000"  # Expose the frontend on port 3001
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3000  # URL for the backend service
+    networks:
+      - app-network
+    volumes:
+      - ./frontend-cgmp:/app  # Sync local changes to Docker container
+      - /app/node_modules  # Ignore node_modules folder for syncing
 
+networks:
+  app-network:
+    driver: bridge
 
-#backend: 
-#cd backend-cgmp && npx nodemon index.js
-#frontend:
-#cd frontend-cgmp &&  npm run dev
+volumes:
+  mongo_data:
+    driver: local

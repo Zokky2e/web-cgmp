@@ -1,6 +1,6 @@
 "use client"; // Mark this component as a Client Component
 import { ThemeProvider } from "@emotion/react";
-import { theme } from "../layout";
+import theme from "@/app/theme";
 import { useUser } from "../contexts/UserContext";
 import PolygonList from "../components/polygons/PolygonList";
 import UserList from "../components/admin/UserList";

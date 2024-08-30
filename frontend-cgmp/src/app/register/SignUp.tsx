@@ -12,7 +12,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { theme } from "../layout";
+import theme from "@/app/theme";
 import { useState } from "react";
 import axios from "axios";
 import { Alert } from "@mui/material";
@@ -36,7 +36,7 @@ export default function SignUp() {
 
 		try {
 			const response = await axios.post(
-				"http://localhost:3000/api/register",
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/register`,
 				user,
 				{
 					withCredentials: true, // Important if you're dealing with sessions

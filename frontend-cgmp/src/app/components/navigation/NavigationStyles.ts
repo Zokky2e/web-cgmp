@@ -1,4 +1,4 @@
-import { theme } from "@/app/layout";
+import theme from "@/app/theme";
 import { SxProps, Theme } from "@mui/material/styles";
 
 export const appBarStyles: SxProps<Theme> = {

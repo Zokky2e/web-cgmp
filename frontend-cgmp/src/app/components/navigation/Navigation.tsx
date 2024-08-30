@@ -29,7 +29,7 @@ import {
 	navBoxItemStyles,
 } from "./NavigationStyles";
 import MenuIcon from "@mui/icons-material/Menu";
-import { theme } from "@/app/layout";
+import theme from "@/app/theme";
 import { useUser } from "@/app/contexts/UserContext";
 import axios from "axios";
 
@@ -74,7 +74,7 @@ export default function Navigation() {
 	const handleLogout = async () => {
 		try {
 			await axios.post(
-				"http://localhost:3000/api/logout",
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/logout`,
 				{},
 				{ withCredentials: true }
 			);
