@@ -44,7 +44,7 @@ export default function SignIn() {
 			setError("");
 			console.log(response.data);
 
-			window.location.href = "/";
+			//window.location.href = "/";
 		} catch (er: any) {
 			if (er.response) {
 				setError(
