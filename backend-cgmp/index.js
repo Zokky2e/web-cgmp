@@ -5,6 +5,7 @@ const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
+const MongoStore = require("connect-mongo");
 const User = require("./models/user");
 const userRoutes = require("./routes/user-routes");
 const polygonRoutes = require("./routes/polygon-routes");
@@ -20,11 +21,19 @@ app.use(
 		credentials: true,
 	})
 );
+mongoose
+	.connect(process.env.MONGO_URI)
+	.then(() => console.log("Connected to MongoDB"))
+	.catch((err) => console.error("Could not connect to MongoDB...", err));
 app.use(
 	session({
 		secret: "yourSecretKey",
 		resave: false,
 		saveUninitialized: false,
+		store: MongoStore.create({
+			mongoUrl: process.env.MONGO_URI, // MongoDB connection string
+			collectionName: "sessions", // Name of the collection for storing sessions
+		}),
 		cookie: {
 			httpOnly: true, // Helps prevent cross-site scripting attacks
 			secure: process.env.NODE_ENV === "production", // Ensures the cookie is only sent over HTTPS
@@ -33,10 +42,6 @@ app.use(
 		},
 	})
 );
-mongoose
-	.connect(process.env.MONGO_URI)
-	.then(() => console.log("Connected to MongoDB"))
-	.catch((err) => console.error("Could not connect to MongoDB...", err));
 // Middleware
 
 app.use(passport.initialize());
