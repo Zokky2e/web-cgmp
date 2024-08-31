@@ -28,7 +28,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 		if (typeof window !== "undefined") {
 			checkAuthStatus();
 		}
-	}, [window]);
+	}, []);
 
 	async function checkAuthStatus() {
 		try {
