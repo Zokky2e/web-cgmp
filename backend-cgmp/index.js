@@ -21,6 +21,7 @@ app.use(
 		credentials: true,
 	})
 );
+app.set("trust proxy", 1);
 mongoose
 	.connect(process.env.MONGO_URI)
 	.then(() => console.log("Connected to MongoDB"))
