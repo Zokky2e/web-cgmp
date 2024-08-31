@@ -31,8 +31,6 @@ export default function RootLayout({
 			</head>
 			<body className={inter.className}>
 				<UserProvider>
-					{" "}
-					{/* Wrap your app with the UserProvider */}
 					<div>
 						<Navigation />
 						{children}

@@ -17,11 +17,14 @@ import theme from "@/app/theme";
 import { useState } from "react";
 import axios from "axios";
 import { Alert } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useUser } from "../contexts/UserContext";
 
 export default function SignIn() {
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
-
+	const { checkAuthStatus } = useUser();
+	const router = useRouter();
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
@@ -43,8 +46,8 @@ export default function SignIn() {
 			setSuccess("Login successful!");
 			setError("");
 			console.log(response.data);
-
-			//window.location.href = "/";
+			checkAuthStatus();
+			router.push("/");
 		} catch (er: any) {
 			if (er.response) {
 				setError(
