@@ -49,7 +49,10 @@ export default function UserList() {
 			}> = await axios.get(
 				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users?page=${
 					page + 1
-				}&limit=${rowsPerPage}&searchQuery=${searchQuery}`
+				}&limit=${rowsPerPage}&searchQuery=${searchQuery}`,
+				{
+					withCredentials: true,
+				}
 			);
 
 			setUsers(response.data.data);

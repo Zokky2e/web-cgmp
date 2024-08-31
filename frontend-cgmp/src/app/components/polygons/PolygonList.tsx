@@ -77,7 +77,8 @@ export default function PolygonList(props: PolygonListProps) {
 			}> = await axios.get(
 				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/pagedPolygon?page=${
 					page + 1
-				}&limit=${rowsPerPage}`
+				}&limit=${rowsPerPage}`,
+				{ withCredentials: true }
 			);
 
 			const processedData = response.data.data.map((polygon) => {

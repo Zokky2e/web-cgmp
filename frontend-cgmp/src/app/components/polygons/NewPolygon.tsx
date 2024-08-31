@@ -75,7 +75,8 @@ export default function NewPolygon(
 	const fetchPolygons = async () => {
 		try {
 			const response: AxiosResponse<IPolygon[]> = await axios.get(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon`
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon`,
+				{ withCredentials: true }
 			);
 
 			const processedData = response.data.map((polygon) => {
