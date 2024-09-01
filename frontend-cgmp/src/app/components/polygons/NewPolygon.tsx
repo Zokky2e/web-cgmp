@@ -16,6 +16,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { MapMouseEvent, Map as MapboxMap } from "mapbox-gl";
 import { mapBoxStyles } from "./PolygonListStyles";
 import { useUser } from "@/app/contexts/UserContext";
+import { popupStyle } from "../shared/SharedStyles";
 
 const accessToken =
 	"pk.eyJ1Ijoiem9ra3kyZSIsImEiOiJjbTAxMThhMTYxbHBmMnJzYjR1eGxmZHBoIn0.wzqyHNfMopK1YzvpNIWUIg";
@@ -30,18 +31,6 @@ const mapStyle = {
 };
 
 const style = "mapbox://styles/mapbox/satellite-v9";
-
-const popupStyle = {
-	position: "absolute" as "absolute",
-	top: "50%",
-	left: "50%",
-	transform: "translate(-50%, -50%)",
-	width: 400,
-	bgcolor: "background.paper",
-	border: "2px solid #000",
-	boxShadow: 24,
-	p: 4,
-};
 
 interface CreatePolygonProps {
 	center: number[];
