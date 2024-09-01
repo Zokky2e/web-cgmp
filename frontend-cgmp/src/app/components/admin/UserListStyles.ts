@@ -38,3 +38,8 @@ export const paginationBoxStyles: SxProps<Theme> = {
 	display: "flex",
 	alignSelf: "flex-end",
 };
+
+export const userPopupStyles: SxProps<Theme> = {
+	display: "flex",
+	flexDirection: "column",
+};

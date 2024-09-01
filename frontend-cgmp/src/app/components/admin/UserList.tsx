@@ -18,6 +18,8 @@ import {
 	TextField,
 	Modal,
 	Select,
+	MenuItem,
+	SelectChangeEvent,
 } from "@mui/material";
 import theme from "@/app/theme";
 import {
@@ -25,6 +27,7 @@ import {
 	tableContainerStyles,
 	tableBoxStyles,
 	paginationBoxStyles,
+	userPopupStyles,
 } from "./UserListStyles";
 import { IUser } from "@/app/models";
 import { popupStyle } from "../shared/SharedStyles";
@@ -39,6 +42,14 @@ export default function UserList() {
 	const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(0);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [open, setOpen] = useState(false);
+	const [selectedUser, setSelectedUser] = useState<IUser>({
+		_id: "",
+		email: "",
+		firstName: "",
+		lastName: "",
+		age: 0,
+		job: "",
+	});
 
 	useEffect(() => {
 		fetchUsers();
@@ -97,22 +108,45 @@ export default function UserList() {
 		fetchUsers();
 	};
 
+	const handleChange = (
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLTextAreaElement | { value: unknown }
+		>
+	) => {
+		const { name, value } = e.target as
+			| HTMLInputElement
+			| HTMLTextAreaElement;
+
+		setSelectedUser((prevUser) => ({
+			...prevUser,
+			[name]: value,
+		}));
+	};
+
+	const handleSelectChange = (event: SelectChangeEvent) => {
+		const { name, value } = event.target;
+
+		setSelectedUser((prevUser) => ({
+			...prevUser,
+			[name]: value,
+		}));
+	};
+
 	async function openEditUserInfo(userId: String) {
-		//fetch user by id
 		const user = (
 			await axios.get(
 				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${userId}`,
 				{ withCredentials: true }
 			)
 		).data;
+		setSelectedUser(user);
 		handleOpen();
 	}
 
 	async function confirmEditUser() {
-		const userId = "";
 		await axios.put(
-			`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${userId}`,
-			{},
+			`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${selectedUser._id}`,
+			{ selectedUser },
 			{ withCredentials: true }
 		);
 	}
@@ -157,7 +191,7 @@ export default function UserList() {
 							{users.map((user, index) => (
 								<StyledUserTableRow
 									theme={theme}
-									key={user.id as React.Key}
+									key={user._id as React.Key}
 									selected={index === selectedRowIndex}
 									onClick={() => handleRowClick(index)}
 								>
@@ -175,9 +209,11 @@ export default function UserList() {
 											variant="contained"
 											color="primary"
 											onClick={() => {
-												openEditUserInfo(user.id);
+												openEditUserInfo(user._id);
 											}}
-										></Button>
+										>
+											Edit
+										</Button>
 									</TableCell>
 								</StyledUserTableRow>
 							))}
@@ -201,52 +237,70 @@ export default function UserList() {
 				aria-labelledby="modal-modal-title"
 				aria-describedby="modal-modal-description"
 			>
-				<Box sx={popupStyle}>
-					<Typography
-						id="modal-modal-title"
-						variant="h6"
-						component="h2"
-					>
-						User
-					</Typography>
-					<Box
-						id="modal-modal-description"
-						sx={{
-							mt: 2,
-							display: "flex",
-							justifyContent: "space-between",
-							alignItems: "center",
-						}}
-					>
-						<TextField
-							required
-							id="outlined-required"
-							label="Firstname"
-							value=""
-							onChange={() => {}}
-						/>
-						<TextField
-							required
-							id="outlined-required"
-							label="Lastnmae"
-							value=""
-							onChange={() => {}}
-						/>
-						<TextField
-							required
-							id="outlined-required"
-							label="Age"
-							value=""
-							onChange={() => {}}
-						/>
-						<Select></Select>
-						<Button
-							variant="contained"
-							onClick={() => confirmEditUser()}
+				<Box sx={[popupStyle, userPopupStyles]}>
+					<div>
+						<Typography
+							id="modal-modal-title"
+							variant="h6"
+							component="h2"
 						>
-							Add
-						</Button>
-					</Box>
+							User
+						</Typography>
+					</div>
+					<div>
+						<Box
+							id="modal-modal-description"
+							sx={{
+								mt: 2,
+								display: "flex",
+								justifyContent: "space-between",
+								alignItems: "center",
+								flexDirection: "column",
+								gap: "16px",
+							}}
+						>
+							<TextField
+								required
+								id="outlined-required"
+								label="Firstname"
+								name="firstname"
+								value={selectedUser?.firstName}
+								onChange={handleChange}
+							/>
+							<TextField
+								required
+								id="outlined-required"
+								label="Lastname"
+								name="lastname"
+								value={selectedUser?.lastName}
+								onChange={handleChange}
+							/>
+							<TextField
+								required
+								id="outlined-required"
+								label="Age"
+								name="age"
+								value={selectedUser?.age}
+								onChange={handleChange}
+							/>
+							<Select
+								value={selectedUser?.job}
+								onChange={handleSelectChange}
+								name="job"
+							>
+								<MenuItem value={"admin"}>Admin</MenuItem>
+								<MenuItem value={"manager"}>Manager</MenuItem>
+								<MenuItem value={"farmer"}>Farmer</MenuItem>
+							</Select>
+						</Box>
+					</div>
+					<Button
+						variant="contained"
+						sx={paginationBoxStyles}
+						onClick={() => confirmEditUser()}
+					>
+						Edit
+					</Button>
 				</Box>
 			</Modal>
 		</ThemeProvider>
