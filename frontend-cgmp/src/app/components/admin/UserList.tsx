@@ -254,7 +254,7 @@ export default function UserList() {
 				aria-labelledby="modal-modal-title"
 				aria-describedby="modal-modal-description"
 			>
-				<Box sx={[popupStyle, userPopupStyles]}>
+				<Box sx={userPopupStyles}>
 					<div>
 						<Typography
 							id="modal-modal-title"
