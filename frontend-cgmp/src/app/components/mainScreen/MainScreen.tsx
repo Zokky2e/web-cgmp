@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, Box, Typography, Button, Grid } from "@mui/material";
 import { heroSectionStyles, featureBoxStyles } from "./MainScreenStyles"; // Import styles
 import { useRouter } from "next/navigation";
+import { useUser } from "@/app/contexts/UserContext";
 
 export default function MainScreen() {
+	const { isAuthenticated, checkAuthStatus } = useUser();
 	const router = useRouter();
+
+	useEffect(() => {
+		checkAuthStatus();
+	}, []);
 	return (
 		<Container maxWidth="lg">
 			{/* Hero Section */}
@@ -41,7 +47,8 @@ export default function MainScreen() {
 					color="primary"
 					sx={{ mt: 2, px: 4 }}
 					onClick={() => {
-						router.push("/plots");
+						if (isAuthenticated) router.push("/plots");
+						else router.push("/login");
 					}}
 				>
 					Get Started

@@ -47,7 +47,7 @@ const settings = [
 export default function Navigation() {
 	const router = useRouter();
 	const isLargeScreen = useMediaQuery("(min-width:1440px)");
-	const { user, isAuthenticated } = useUser();
+	const { user, isAuthenticated, checkAuthStatus } = useUser();
 
 	const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 	const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -69,6 +69,7 @@ export default function Navigation() {
 	};
 
 	const handleNavigationToPage = (pageUrl: string) => {
+		checkAuthStatus();
 		router.push(pageUrl);
 		handleCloseNavMenu();
 	};
@@ -237,7 +238,11 @@ export default function Navigation() {
 														color: theme.palette
 															.primary.main,
 													}}
-													href={setting.url}
+													onClick={() => {
+														router.push(
+															setting.url
+														);
+													}}
 												>
 													{setting.title}
 												</Link>

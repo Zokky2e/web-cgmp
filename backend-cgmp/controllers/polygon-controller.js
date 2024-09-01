@@ -82,35 +82,6 @@ exports.getPolygonById = async (req, res) => {
 			res.status(400).json({ message: error.message });
 		});
 };
-//OLD postPolygon
-// exports.postPolygons = async (req, res) => {
-// 	try {
-// 		const userId = req.user.id;
-// 		const polygons = req.body;
-// 		//console.log(req.body);
-// 		const savedPolygons = await Promise.all(
-// 			polygons.map(async (polygonData) => {
-// 				const polygon = new Polygon({
-// 					userId,
-// 					polygonId: polygonData.id,
-// 					createdAt: new Date(polygonData.created_at),
-// 				});
-// 				console.log(polygon);
-// 				const url = `http://api.agromonitoring.com/agro/1.0/polygons?appid=${process.env.agromonitoring_api_key}`;
-// 				await axios
-// 					.post(url, polygonData)
-// 					.then(async (r) => {
-// 						polygon.polygonId = r.data.id;
-// 						await polygon.save();
-// 					})
-// 					.catch((err) => console.log(err));
-// 			})
-// 		);
-// 		res.status(201).json(savedPolygons);
-// 	} catch (error) {
-// 		res.status(400).json({ message: error.message });
-// 	}
-// };
 
 exports.postPolygons = async (req, res) => {
 	try {

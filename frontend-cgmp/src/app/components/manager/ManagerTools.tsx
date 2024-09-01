@@ -19,6 +19,7 @@ export default function ManagerTools() {
 			<Box>
 				<PolygonList title="Edit plots" />
 			</Box>
+			<Box></Box>
 		</ThemeProvider>
 	);
 }
