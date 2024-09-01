@@ -11,8 +11,13 @@ import {
 	treeItemStyles,
 	treeViewStyles,
 } from "./AdminToolsStyles";
+import { useState } from "react";
+import { IPolygon } from "@/app/models";
 
 export default function AdminTools() {
+	const [selectedPolygon, setSelectedPolygon] = useState<IPolygon | null>(
+		null
+	);
 	return (
 		<ThemeProvider theme={theme}>
 			<Typography
@@ -30,7 +35,12 @@ export default function AdminTools() {
 						itemId="polygons"
 						label="Polygons"
 					>
-						<PolygonList title="Edit plots" />
+						<PolygonList
+							title="Edit plots"
+							setSelectedPolygon={(polygon) => {
+								setSelectedPolygon(polygon);
+							}}
+						/>
 					</TreeItem>
 					<TreeItem sx={treeItemStyles} itemId="users" label="Users">
 						<UserList />

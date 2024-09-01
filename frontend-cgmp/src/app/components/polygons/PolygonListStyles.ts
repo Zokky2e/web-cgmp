@@ -49,3 +49,12 @@ export const tableBoxStyles: SxProps<Theme> = {
 	width: { xs: "100%", md: "50%" },
 	overflowX: "auto",
 };
+
+export const requestedPolygonInfo: SxProps<Theme> = {
+	display: "flex",
+	flexDirection: "column",
+	alignItems: "flex-start",
+	justifyContent: "center",
+	width: { xs: "100%", md: "50%" },
+	marginBottom: { xs: 2, md: 0 },
+};

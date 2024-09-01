@@ -7,6 +7,7 @@ import UserList from "../components/admin/UserList";
 import AdminTools from "../components/admin/AdminTools";
 import { Box, CircularProgress } from "@mui/material";
 import { CircleLoaderStyles } from "../components/polygons/PolygonListStyles";
+import ManagerTools from "../components/manager/ManagerTools";
 
 export default function ToolsPage() {
 	const { user, isAuthenticated } = useUser();
@@ -17,7 +18,7 @@ export default function ToolsPage() {
 				case "manager":
 					return (
 						<>
-							<PolygonList title="Manage plots" />
+							<ManagerTools />
 						</>
 					);
 					break;

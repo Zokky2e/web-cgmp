@@ -31,6 +31,7 @@ import { useUser } from "@/app/contexts/UserContext";
 
 interface PolygonListProps {
 	title: string;
+	setSelectedPolygon: (polygon: IPolygon) => void;
 }
 
 export default function PolygonList(props: PolygonListProps) {
@@ -127,7 +128,7 @@ export default function PolygonList(props: PolygonListProps) {
 
 		try {
 			await axios.post(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon/request/${selectedPolygon.id}`,
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/requestedPolygon/${selectedPolygon.id}`,
 				{},
 				{ withCredentials: true }
 			);
@@ -153,6 +154,7 @@ export default function PolygonList(props: PolygonListProps) {
 	};
 
 	const handleRowClick = (index: number, center: number[]) => {
+		props.setSelectedPolygon(data[index]);
 		setSelectedRowIndex(index);
 		setCenter(center);
 	};

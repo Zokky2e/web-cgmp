@@ -6,7 +6,10 @@ import theme from "@/app/theme";
 export default function PlotsPage() {
 	return (
 		<ThemeProvider theme={theme}>
-			<PolygonList title="Available plots" />
+			<PolygonList
+				title="Available plots"
+				setSelectedPolygon={() => {}}
+			/>
 		</ThemeProvider>
 	);
 }

@@ -81,7 +81,7 @@ export default function Navigation() {
 				{},
 				{ withCredentials: true }
 			);
-			router.push("/login");
+			checkAuthStatus();
 		} catch (error) {
 			console.error("Error logging out:", error);
 		}
@@ -114,49 +114,55 @@ export default function Navigation() {
 								: "CGMP"}
 						</Typography>
 
-						<Box sx={menuBoxStyles}>
-							<IconButton
-								size="large"
-								aria-label="account of current user"
-								aria-controls="menu-appbar"
-								aria-haspopup="true"
-								onClick={handleOpenNavMenu}
-								color="inherit"
-							>
-								<MenuIcon />
-							</IconButton>
-							<Menu
-								id="menu-appbar"
-								anchorEl={anchorElNav}
-								anchorOrigin={{
-									vertical: "bottom",
-									horizontal: "left",
-								}}
-								keepMounted
-								transformOrigin={{
-									vertical: "top",
-									horizontal: "left",
-								}}
-								open={Boolean(anchorElNav)}
-								onClose={handleCloseNavMenu}
-								sx={{
-									display: { xs: "block", md: "none" },
-								}}
-							>
-								{pages.map((page) => (
-									<MenuItem
-										key={page.title}
-										onClick={() => {
-											handleNavigationToPage(page.url);
-										}}
-									>
-										<Typography textAlign="center">
-											{page.title}
-										</Typography>
-									</MenuItem>
-								))}
-							</Menu>
-						</Box>
+						{isAuthenticated ? (
+							<Box sx={menuBoxStyles}>
+								<IconButton
+									size="large"
+									aria-label="account of current user"
+									aria-controls="menu-appbar"
+									aria-haspopup="true"
+									onClick={handleOpenNavMenu}
+									color="inherit"
+								>
+									<MenuIcon />
+								</IconButton>
+								<Menu
+									id="menu-appbar"
+									anchorEl={anchorElNav}
+									anchorOrigin={{
+										vertical: "bottom",
+										horizontal: "left",
+									}}
+									keepMounted
+									transformOrigin={{
+										vertical: "top",
+										horizontal: "left",
+									}}
+									open={Boolean(anchorElNav)}
+									onClose={handleCloseNavMenu}
+									sx={{
+										display: { xs: "block", md: "none" },
+									}}
+								>
+									{pages.map((page) => (
+										<MenuItem
+											key={page.title}
+											onClick={() => {
+												handleNavigationToPage(
+													page.url
+												);
+											}}
+										>
+											<Typography textAlign="center">
+												{page.title}
+											</Typography>
+										</MenuItem>
+									))}
+								</Menu>
+							</Box>
+						) : (
+							<></>
+						)}
 
 						<Typography
 							variant="h5"
@@ -192,7 +198,7 @@ export default function Navigation() {
 							""
 						)}
 						<Box sx={avatarBoxStyles}>
-							<Tooltip title="Open settings">
+							<Tooltip title="Open User Settings">
 								<IconButton
 									onClick={handleOpenUserMenu}
 									sx={{ p: 0 }}
@@ -229,7 +235,10 @@ export default function Navigation() {
 									settings.map((setting) => (
 										<MenuItem
 											key={setting.title}
-											onClick={handleCloseUserMenu}
+											onClick={() => {
+												router.push(setting.url);
+												handleCloseUserMenu();
+											}}
 										>
 											<Typography textAlign="center">
 												<Link
@@ -237,11 +246,6 @@ export default function Navigation() {
 														textDecoration: "none",
 														color: theme.palette
 															.primary.main,
-													}}
-													onClick={() => {
-														router.push(
-															setting.url
-														);
 													}}
 												>
 													{setting.title}
