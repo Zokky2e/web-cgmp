@@ -17,6 +17,7 @@ import {
 	Tooltip,
 	TextField,
 	Modal,
+	Select,
 } from "@mui/material";
 import theme from "@/app/theme";
 import {
@@ -96,11 +97,25 @@ export default function UserList() {
 		fetchUsers();
 	};
 
-	function openEditUserInfo(userId: String) {
+	async function openEditUserInfo(userId: String) {
 		//fetch user by id
+		const user = (
+			await axios.get(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${userId}`,
+				{ withCredentials: true }
+			)
+		).data;
+		handleOpen();
 	}
 
-	function confirmEditUser() {}
+	async function confirmEditUser() {
+		const userId = "";
+		await axios.put(
+			`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${userId}`,
+			{},
+			{ withCredentials: true }
+		);
+	}
 
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
@@ -206,10 +221,25 @@ export default function UserList() {
 						<TextField
 							required
 							id="outlined-required"
-							label="Required"
+							label="Firstname"
 							value=""
 							onChange={() => {}}
 						/>
+						<TextField
+							required
+							id="outlined-required"
+							label="Lastnmae"
+							value=""
+							onChange={() => {}}
+						/>
+						<TextField
+							required
+							id="outlined-required"
+							label="Age"
+							value=""
+							onChange={() => {}}
+						/>
+						<Select></Select>
 						<Button
 							variant="contained"
 							onClick={() => confirmEditUser()}
