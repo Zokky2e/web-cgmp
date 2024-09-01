@@ -1,8 +1,10 @@
 import React from "react";
 import { Container, Box, Typography, Button, Grid } from "@mui/material";
 import { heroSectionStyles, featureBoxStyles } from "./MainScreenStyles"; // Import styles
+import { useRouter } from "next/navigation";
 
 export default function MainScreen() {
+	const router = useRouter();
 	return (
 		<Container maxWidth="lg">
 			{/* Hero Section */}
@@ -39,7 +41,7 @@ export default function MainScreen() {
 					color="primary"
 					sx={{ mt: 2, px: 4 }}
 					onClick={() => {
-						window.location.href = "/plots";
+						router.push("/plots");
 					}}
 				>
 					Get Started

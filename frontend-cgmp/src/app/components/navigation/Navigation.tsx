@@ -32,6 +32,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import theme from "@/app/theme";
 import { useUser } from "@/app/contexts/UserContext";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const pages = [
 	{ title: "Plots", url: "/plots" },
@@ -44,6 +45,7 @@ const settings = [
 ];
 
 export default function Navigation() {
+	const router = useRouter();
 	const isLargeScreen = useMediaQuery("(min-width:1440px)");
 	const { user, isAuthenticated } = useUser();
 
@@ -67,7 +69,7 @@ export default function Navigation() {
 	};
 
 	const handleNavigationToPage = (pageUrl: string) => {
-		window.location.href = pageUrl;
+		router.push(pageUrl);
 		handleCloseNavMenu();
 	};
 
@@ -78,7 +80,7 @@ export default function Navigation() {
 				{},
 				{ withCredentials: true }
 			);
-			window.location.href = "/login";
+			router.push("/login");
 		} catch (error) {
 			console.error("Error logging out:", error);
 		}
@@ -98,7 +100,9 @@ export default function Navigation() {
 							variant="h6"
 							noWrap
 							component="a"
-							href="/"
+							onClick={() => {
+								router.push("/");
+							}}
 							sx={{
 								...logoStyles,
 								color: theme.palette.primary.contrastText,
@@ -157,7 +161,9 @@ export default function Navigation() {
 							variant="h5"
 							noWrap
 							component="a"
-							href="/"
+							onClick={() => {
+								router.push("/");
+							}}
 							sx={{
 								...mobileLogoStyles,
 								color: theme.palette.primary.contrastText,

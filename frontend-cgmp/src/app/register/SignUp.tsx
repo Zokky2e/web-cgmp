@@ -16,8 +16,10 @@ import theme from "@/app/theme";
 import { useState } from "react";
 import axios from "axios";
 import { Alert } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 export default function SignUp() {
+	const router = useRouter();
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -46,7 +48,7 @@ export default function SignUp() {
 			setSuccess("User registered successfully!");
 			setError("");
 			// Redirect or perform further actions on successful login
-			window.location.href = "/login"; // Redirect to home page or dashboard
+			router.push("/login"); // Redirect to home page or dashboard
 		} catch (er: any) {
 			if (er.response) {
 				// The request was made, and the server responded with a status code that falls out of the range of 2xx
