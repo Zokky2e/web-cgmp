@@ -104,6 +104,22 @@ exports.getRequestedPolygons = async (req, res) => {
 		const userId = req.user.id;
 
 		const requestedPolygons = await RequestedPolygon.find({ userId });
+		res.status(200).json(requestedPolygons);
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
+
+exports.getRequestedPolygonById = async (req, res) => {
+	try {
+		const polygonId = req.params.id;
+		const requestedPolygons = await RequestedPolygon.find({
+			polygonId,
+		}).populate("userId", "firstName lastName age");
+
+		if (requestedPolygons.length === 0) {
+			return res.status(200).json([]);
+		}
 
 		res.status(200).json(requestedPolygons);
 	} catch (error) {
@@ -113,7 +129,7 @@ exports.getRequestedPolygons = async (req, res) => {
 
 exports.requestPolygon = async (req, res) => {
 	try {
-		const userId = req.user.id;
+		const userId = mongoose.Types.ObjectId(req.user.id);
 		const polygonId = req.params.id;
 
 		const existingRequest = await RequestedPolygon.findOne({
@@ -137,6 +153,53 @@ exports.requestPolygon = async (req, res) => {
 
 		res.status(201).json({
 			message: "Polygon request saved successfully.",
+		});
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
+
+// Accept a user request for a polygon
+exports.acceptPolygonRequest = async (req, res) => {
+	const { id } = req.params; // Polygon ID
+	const { userId } = req.body; // User ID of the user to accept
+
+	try {
+		await RequestedPolygon.deleteMany({
+			polygonId: id,
+			userId: { $ne: userId },
+		});
+
+		res.status(200).json({
+			message: "User request accepted successfully.",
+		});
+	} catch (error) {
+		res.status(500).json({ message: "Error accepting user request." });
+	}
+};
+
+// Deny a user request for a polygon
+exports.denyPolygonRequest = async (req, res) => {
+	const { id, userId } = req.params; // Polygon ID and User ID
+
+	try {
+		await RequestedPolygon.deleteOne({ polygonId: id, userId });
+
+		res.status(200).json({ message: "User request denied successfully." });
+	} catch (error) {
+		res.status(500).json({ message: "Error denying user request." });
+	}
+};
+
+exports.deletePolygon = async (req, res) => {
+	try {
+		const polygonId = req.params.id;
+		const response = await axios.get(
+			`http://api.agromonitoring.com/agro/1.0/polygons/${polygonId}}?appid=${process.env.agromonitoring_api_key}`
+		);
+
+		res.status(response.code).json({
+			message: response?.message,
 		});
 	} catch (error) {
 		res.status(400).json({ message: error.message });

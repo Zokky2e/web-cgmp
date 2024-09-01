@@ -6,7 +6,8 @@ const RequestedPolygonSchema = new mongoose.Schema({
 		required: true,
 	},
 	userId: {
-		type: String,
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "User", // Reference the User model
 		required: true,
 	},
 	timestamp: {
