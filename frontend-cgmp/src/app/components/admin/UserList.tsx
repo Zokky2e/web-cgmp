@@ -108,7 +108,7 @@ export default function UserList() {
 		fetchUsers();
 	};
 
-	const handleChange = (
+	const handleTextChange = (
 		e: React.ChangeEvent<
 			HTMLInputElement | HTMLTextAreaElement | { value: unknown }
 		>
@@ -116,10 +116,23 @@ export default function UserList() {
 		const { name, value } = e.target as
 			| HTMLInputElement
 			| HTMLTextAreaElement;
-
 		setSelectedUser((prevUser) => ({
 			...prevUser,
 			[name]: value,
+		}));
+	};
+
+	const handleNumberChange = (
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLTextAreaElement | { value: unknown }
+		>
+	) => {
+		const { name, value } = e.target as
+			| HTMLInputElement
+			| HTMLTextAreaElement;
+		setSelectedUser((prevUser) => ({
+			...prevUser,
+			[name]: parseInt(value),
 		}));
 	};
 
@@ -139,6 +152,8 @@ export default function UserList() {
 				{ withCredentials: true }
 			)
 		).data;
+		delete user?.password;
+		delete user?.email;
 		setSelectedUser(user);
 		handleOpen();
 	}
@@ -146,9 +161,11 @@ export default function UserList() {
 	async function confirmEditUser() {
 		await axios.put(
 			`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${selectedUser._id}`,
-			{ selectedUser },
+			selectedUser,
 			{ withCredentials: true }
 		);
+		handleClose();
+		fetchUsers();
 	}
 
 	const handleOpen = () => setOpen(true);
@@ -265,7 +282,7 @@ export default function UserList() {
 								label="Firstname"
 								name="firstname"
 								value={selectedUser?.firstName}
-								onChange={handleChange}
+								onChange={handleTextChange}
 							/>
 							<TextField
 								required
@@ -273,15 +290,16 @@ export default function UserList() {
 								label="Lastname"
 								name="lastname"
 								value={selectedUser?.lastName}
-								onChange={handleChange}
+								onChange={handleTextChange}
 							/>
 							<TextField
 								required
 								id="outlined-required"
 								label="Age"
 								name="age"
+								type="number"
 								value={selectedUser?.age}
-								onChange={handleChange}
+								onChange={handleNumberChange}
 							/>
 							<Select
 								value={selectedUser?.job}

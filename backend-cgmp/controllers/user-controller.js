@@ -40,6 +40,7 @@ exports.logoutUser = (req, res) => {
 			if (err) {
 				return res.status(500).json({ message: err.message });
 			}
+			res.clearCookie("connect.sid", { path: "/" });
 			res.status(200).json({ message: "Logged out successfully" });
 		});
 	});
