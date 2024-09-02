@@ -10,7 +10,7 @@ exports.registerUser = async (req, res) => {
 			firstName,
 			lastName,
 			age: 18,
-			job: "",
+			job: "farmer",
 		});
 		await newUser.save();
 		res.status(201).json(newUser);

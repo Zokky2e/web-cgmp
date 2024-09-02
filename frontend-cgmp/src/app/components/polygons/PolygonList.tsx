@@ -302,8 +302,7 @@ export default function PolygonList(props: PolygonListProps) {
 								disableHoverListener={!isButtonDisabled}
 							>
 								<span>
-									{" "}
-									{user?.job == "farmer" ? (
+									{user?.job == "farmer" && (
 										<Button
 											variant="contained"
 											color="primary"
@@ -317,15 +316,17 @@ export default function PolygonList(props: PolygonListProps) {
 										>
 											Request Plot
 										</Button>
-									) : (
-										<Button
-											variant="contained"
-											color="primary"
-											onClick={() => handleOpen()}
-										>
-											Delete Plot
-										</Button>
 									)}
+									{user?.job != "farmer" &&
+										user?.job != "" && (
+											<Button
+												variant="contained"
+												color="primary"
+												onClick={() => handleOpen()}
+											>
+												Delete Plot
+											</Button>
+										)}
 								</span>
 							</Tooltip>
 						</Box>
