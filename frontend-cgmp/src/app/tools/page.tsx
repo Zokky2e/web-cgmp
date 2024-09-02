@@ -2,6 +2,6 @@
 
 import ToolsPage from "./ToolsPage";
 
-export default function Plots() {
+export default function Tools() {
 	return <ToolsPage />;
 }

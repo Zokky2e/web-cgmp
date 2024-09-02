@@ -9,7 +9,7 @@ router.get("/polygon/:id/:x/:y/:z", polygonController.getPolygonById);
 router.get("/polygon/:id/:created_at", polygonController.getPolygonById);
 router.post("/polygon", isAuthenticated, polygonController.postPolygons);
 router.post(
-	"/polygon/request/:id",
+	"/requestedPolygon/:id",
 	isAuthenticated,
 	polygonController.requestPolygon
 );
@@ -28,10 +28,21 @@ router.post(
 	isAuthenticated,
 	polygonController.acceptPolygonRequest
 );
+router.get(
+	"/ownedPolygons",
+	isAuthenticated,
+	polygonController.getOwnedPolygons
+);
 router.delete(
 	"/polygon/requested/:id/:userId",
 	isAuthenticated,
 	polygonController.denyPolygonRequest
+);
+
+router.delete(
+	"/polygon/:id/",
+	isAuthenticated,
+	polygonController.deletePolygon
 );
 
 module.exports = router;

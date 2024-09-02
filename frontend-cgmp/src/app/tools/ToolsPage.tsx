@@ -8,6 +8,7 @@ import AdminTools from "../components/admin/AdminTools";
 import { Box, CircularProgress } from "@mui/material";
 import { CircleLoaderStyles } from "../components/polygons/PolygonListStyles";
 import ManagerTools from "../components/manager/ManagerTools";
+import OwnedPolygonList from "../components/polygons/OwnedPolygonList";
 
 export default function ToolsPage() {
 	const { user, isAuthenticated } = useUser();
@@ -30,7 +31,11 @@ export default function ToolsPage() {
 					);
 					break;
 				default:
-					return <>User</>;
+					return (
+						<>
+							<OwnedPolygonList />
+						</>
+					);
 					break;
 			}
 		}

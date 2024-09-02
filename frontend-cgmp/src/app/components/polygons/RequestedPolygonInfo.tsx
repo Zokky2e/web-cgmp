@@ -22,6 +22,7 @@ import {
 interface RequestedPolygonInfoProps {
 	polygon: IPolygon | null;
 	users: IUser[];
+	refreshList: () => void;
 }
 
 export default function RequestedPolygonInfo(props: RequestedPolygonInfoProps) {
@@ -36,8 +37,7 @@ export default function RequestedPolygonInfo(props: RequestedPolygonInfoProps) {
 				{ withCredentials: true }
 			);
 
-			// Refresh the list after accepting a request
-			console.log("User request accepted successfully.");
+			props.refreshList();
 		} catch (error) {
 			console.error("Error accepting request:", error);
 		}
@@ -50,8 +50,7 @@ export default function RequestedPolygonInfo(props: RequestedPolygonInfoProps) {
 				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon/requested/${polygon?.id}/${userId}`,
 				{ withCredentials: true }
 			);
-
-			console.log("User request denied successfully.");
+			props.refreshList();
 		} catch (error) {
 			console.error("Error denying request:", error);
 		}

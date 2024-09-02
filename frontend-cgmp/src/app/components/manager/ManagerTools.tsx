@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { IPolygon, IUser } from "@/app/models";
 import RequestedPolygonInfo from "../polygons/RequestedPolygonInfo";
 import axios from "axios";
+import OwnedPolygonList from "../polygons/OwnedPolygonList";
 
 export default function ManagerTools() {
 	const [selectedPolygon, setSelectedPolygon] = useState<IPolygon | null>(
@@ -17,27 +18,24 @@ export default function ManagerTools() {
 	const [users, setUsers] = useState<IUser[]>([]);
 	useEffect(() => {
 		if (selectedPolygon && selectedPolygon.id) {
-			const fetchRequestedPolygonUsers = async () => {
-				try {
-					const response = await axios.get(
-						`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/requestedPolygon/${selectedPolygon.id}`,
-						{ withCredentials: true }
-					);
-
-					setUsers(
-						response.data.map((request: any) => request?.userId)
-					); // Extract the user information
-				} catch (error) {
-					console.error(
-						"Error fetching requested polygon users:",
-						error
-					);
-				}
-			};
-
 			fetchRequestedPolygonUsers();
 		}
 	}, [selectedPolygon]);
+
+	const fetchRequestedPolygonUsers = async () => {
+		try {
+			const response = await axios.get(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/requestedPolygon/${
+					selectedPolygon!!.id
+				}`,
+				{ withCredentials: true }
+			);
+
+			setUsers(response.data.map((request: any) => request?.userId)); // Extract the user information
+		} catch (error) {
+			console.error("Error fetching requested polygon users:", error);
+		}
+	};
 	return (
 		<ThemeProvider theme={theme}>
 			<Typography
@@ -55,8 +53,12 @@ export default function ManagerTools() {
 					}}
 				/>
 			</Box>
-			<RequestedPolygonInfo polygon={selectedPolygon} users={users} />
-			<Box></Box>
+			<RequestedPolygonInfo
+				polygon={selectedPolygon}
+				users={users}
+				refreshList={() => fetchRequestedPolygonUsers()}
+			/>
+			<OwnedPolygonList />
 		</ThemeProvider>
 	);
 }

@@ -1,7 +1,9 @@
 const axios = require("axios");
 const _ = require("underscore");
+const mongoose = require("mongoose");
 const Polygon = require("../models/polygon");
 const RequestedPolygon = require("../models/requestedPolygon"); // Import the model
+const OwnedPolygon = require("../models/ownedPolygon"); // Import the model
 
 exports.getPolygons = async (req, res) => {
 	const page = parseInt(req.query.page, 10) || 1;
@@ -102,7 +104,6 @@ exports.postPolygons = async (req, res) => {
 exports.getRequestedPolygons = async (req, res) => {
 	try {
 		const userId = req.user.id;
-
 		const requestedPolygons = await RequestedPolygon.find({ userId });
 		res.status(200).json(requestedPolygons);
 	} catch (error) {
@@ -129,7 +130,8 @@ exports.getRequestedPolygonById = async (req, res) => {
 
 exports.requestPolygon = async (req, res) => {
 	try {
-		const userId = mongoose.Types.ObjectId(req.user.id);
+		const userId = req.user.id;
+		console.log(userId);
 		const polygonId = req.params.id;
 
 		const existingRequest = await RequestedPolygon.findOne({
@@ -165,13 +167,23 @@ exports.acceptPolygonRequest = async (req, res) => {
 	const { userId } = req.body; // User ID of the user to accept
 
 	try {
+		// Remove all other requests for this polygon
 		await RequestedPolygon.deleteMany({
 			polygonId: id,
-			userId: { $ne: userId },
 		});
 
+		// Add the accepted polygon to the OwnedPolygon collection
+		const ownedPolygon = new OwnedPolygon({
+			polygonId: id,
+			userId,
+		});
+
+		await ownedPolygon.save();
+
 		res.status(200).json({
-			message: "User request accepted successfully.",
+			message:
+				"User request accepted and polygon added to ownership successfully.",
+			ownedPolygon,
 		});
 	} catch (error) {
 		res.status(500).json({ message: "Error accepting user request." });
@@ -191,15 +203,84 @@ exports.denyPolygonRequest = async (req, res) => {
 	}
 };
 
+// Fetch paginated owned polygons with optional filtering by userId
+exports.getOwnedPolygons = async (req, res) => {
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit, 10) || 10;
+	const skip = (page - 1) * limit;
+	const userId = req.query.userId;
+
+	try {
+		// Build the query with optional userId filtering
+		const query = userId ? { userId } : {};
+
+		const ownedPolygons = await OwnedPolygon.find(query)
+			.populate("userId", "firstName lastName") // Optional: Populate user details
+			.skip(skip)
+			.limit(limit)
+			.exec();
+
+		const total = await OwnedPolygon.countDocuments(query);
+
+		const response = await axios.get(
+			`http://api.agromonitoring.com/agro/1.0/polygons?appid=${process.env.agromonitoring_api_key}`
+		);
+		const polygons = response.data;
+
+		const polygonMap = new Map();
+		polygons.forEach((polygon) => {
+			polygonMap.set(polygon.id, polygon.name); // Assuming each polygon has an 'id' and 'name'
+		});
+
+		// Step 4: Add polygon names to ownedPolygons
+		const ownedPolygonsWithNames = ownedPolygons.map((ownedPolygon) => {
+			const polygonName =
+				polygonMap.get(ownedPolygon.polygonId) || "Unknown";
+			return {
+				...ownedPolygon._doc, // Use `_doc` to ensure we are modifying the plain object representation
+				polygonName,
+			};
+		});
+
+		res.status(200).json({
+			total,
+			page,
+			limit,
+			totalPages: Math.ceil(total / limit),
+			data: ownedPolygonsWithNames,
+		});
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
+
 exports.deletePolygon = async (req, res) => {
 	try {
 		const polygonId = req.params.id;
-		const response = await axios.get(
-			`http://api.agromonitoring.com/agro/1.0/polygons/${polygonId}}?appid=${process.env.agromonitoring_api_key}`
-		);
 
-		res.status(response.code).json({
-			message: response?.message,
+		// Step 1: Delete the polygon from the Agromonitoring API
+		const response = await axios.delete(
+			`http://api.agromonitoring.com/agro/1.0/polygons/${polygonId}?appid=${process.env.agromonitoring_api_key}`
+		);
+		console.log(response);
+		if (response.status !== 204) {
+			return res.status(response.status).json({
+				message:
+					response?.data?.message ||
+					"Failed to delete polygon from Agromonitoring API.",
+			});
+		}
+
+		// Step 2: Delete all related entries from the OwnedPolygon and RequestedPolygon collections
+		await Promise.all([
+			OwnedPolygon.deleteMany({ polygonId }),
+			RequestedPolygon.deleteMany({ polygonId }),
+		]);
+
+		// Step 3: Send a success response
+		res.status(200).json({
+			message:
+				"Polygon deleted successfully along with all related owned and requested polygons.",
 		});
 	} catch (error) {
 		res.status(400).json({ message: error.message });

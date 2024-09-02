@@ -17,6 +17,7 @@ import {
 	TablePagination,
 	TablePaginationProps,
 	Tooltip,
+	Modal,
 } from "@mui/material";
 import NewPolygon from "./NewPolygon";
 import { IPolygon, IRequestedPolygon } from "@/app/models";
@@ -28,6 +29,7 @@ import {
 } from "./PolygonListStyles"; // Import styles
 import theme from "@/app/theme";
 import { useUser } from "@/app/contexts/UserContext";
+import { popupStyle } from "../shared/SharedStyles";
 
 interface PolygonListProps {
 	title: string;
@@ -48,6 +50,7 @@ export default function PolygonList(props: PolygonListProps) {
 	>([]);
 	const { user, isAuthenticated } = useUser();
 	const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+	const [open, setOpen] = useState(false);
 	useEffect(() => {
 		fetchPagedPolygons();
 		if (user?.job == "farmer") {
@@ -111,7 +114,7 @@ export default function PolygonList(props: PolygonListProps) {
 		try {
 			const response: AxiosResponse<IRequestedPolygon[]> =
 				await axios.get(
-					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon/requested`,
+					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/requestedPolygon`,
 					{
 						withCredentials: true,
 					}
@@ -158,6 +161,24 @@ export default function PolygonList(props: PolygonListProps) {
 		setSelectedRowIndex(index);
 		setCenter(center);
 	};
+
+	async function handleDeletePolygon() {
+		const selectedPolygon = data[selectedRowIndex ? selectedRowIndex : 0];
+		if (!selectedPolygon) return;
+
+		try {
+			await axios.delete(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon/${selectedPolygon.id}`,
+				{ withCredentials: true }
+			);
+			fetchPagedPolygons();
+		} catch (error) {
+			console.error("Failed to request plot:", error);
+		}
+	}
+
+	const handleOpen = () => setOpen(true);
+	const handleClose = () => setOpen(false);
 
 	return (
 		<Container sx={gridContainerStyles}>
@@ -300,6 +321,7 @@ export default function PolygonList(props: PolygonListProps) {
 										<Button
 											variant="contained"
 											color="primary"
+											onClick={() => handleOpen()}
 										>
 											Delete Plot
 										</Button>
@@ -310,6 +332,50 @@ export default function PolygonList(props: PolygonListProps) {
 					</Box>
 				</>
 			)}
+			<Modal
+				open={open}
+				onClose={handleClose}
+				aria-labelledby="modal-modal-title"
+				aria-describedby="modal-modal-description"
+			>
+				<Box sx={popupStyle}>
+					<Typography
+						id="modal-modal-title"
+						variant="h5"
+						component="div"
+					>
+						Delete field:{" "}
+						{data[selectedRowIndex ? selectedRowIndex : 0]?.name}
+						<Typography variant="h6" component="h4">
+							Are you sure you want to delete{" "}
+							{
+								data[selectedRowIndex ? selectedRowIndex : 0]
+									?.name
+							}{" "}
+							and all owned and requested fields values?
+						</Typography>
+					</Typography>
+					<Box
+						id="modal-modal-description"
+						sx={{
+							mt: 2,
+							display: "flex",
+							justifyContent: "space-between",
+							alignItems: "center",
+						}}
+					>
+						<Button
+							variant="contained"
+							onClick={() => handleDeletePolygon()}
+						>
+							Confirm
+						</Button>
+						<Button variant="contained" onClick={handleClose}>
+							Cancel
+						</Button>
+					</Box>
+				</Box>
+			</Modal>
 		</Container>
 	);
 }

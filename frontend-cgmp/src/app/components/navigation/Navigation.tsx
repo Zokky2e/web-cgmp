@@ -82,6 +82,8 @@ export default function Navigation() {
 				{ withCredentials: true }
 			);
 			checkAuthStatus();
+
+			handleCloseUserMenu();
 		} catch (error) {
 			console.error("Error logging out:", error);
 		}
@@ -107,6 +109,7 @@ export default function Navigation() {
 							sx={{
 								...logoStyles,
 								color: theme.palette.primary.contrastText,
+								cursor: "pointer",
 							}}
 						>
 							{isLargeScreen

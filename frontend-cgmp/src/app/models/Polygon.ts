@@ -1,3 +1,5 @@
+import { IUser } from "./User";
+
 export interface IPolygon {
 	id?: String;
 	name?: String;
@@ -26,4 +28,11 @@ export interface IRequestedPolygon {
 	userId: string;
 	timestamp: string;
 	__v: number;
+}
+
+export interface IOwnedPolygon {
+	polygonId: string;
+	polygonName: string;
+	userId: IUser;
+	acquiredAt: string;
 }

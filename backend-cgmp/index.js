@@ -9,6 +9,7 @@ const MongoStore = require("connect-mongo");
 const User = require("./models/user");
 const userRoutes = require("./routes/user-routes");
 const polygonRoutes = require("./routes/polygon-routes");
+const threadRoutes = require("./routes/thread-routes");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -94,6 +95,9 @@ app.use("/api", userRoutes);
 
 // Use polygon routes
 app.use("/api", polygonRoutes);
+
+// Use thread routes
+app.use("/api", threadRoutes);
 
 // Start the server
 app.listen(port, () => {
