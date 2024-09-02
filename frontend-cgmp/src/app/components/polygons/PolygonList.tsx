@@ -171,6 +171,7 @@ export default function PolygonList(props: PolygonListProps) {
 				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/polygon/${selectedPolygon.id}`,
 				{ withCredentials: true }
 			);
+			handleClose();
 			fetchPagedPolygons();
 		} catch (error) {
 			console.error("Failed to request plot:", error);
