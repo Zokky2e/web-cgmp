@@ -44,6 +44,7 @@ export default function UserList() {
 	const [open, setOpen] = useState(false);
 	const [selectedUser, setSelectedUser] = useState<IUser>({
 		_id: "",
+		id: "",
 		email: "",
 		firstName: "",
 		lastName: "",
